@@ -1,0 +1,130 @@
+// 1. Generator & Datasource Setup
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// 1. USER TABLE (Authentication)
+// ==========================================
+model User {
+  id            String   @id @default(cuid()) // Unique String ID
+  username      String   @db.VarChar(50)
+  email         String   @unique @db.VarChar(100)
+  password_hash String   @db.VarChar(255)
+  created_at    DateTime @default(now())
+
+  // Relations (Links to other tables)
+  cv            CV?                  // One User has One CV (Optional initially)
+  sessions      InterviewSession[]   // One User can have Many Sessions
+  reports       FinalReport[]        // One User can have Many Reports
+
+  @@map("users") // Database table name will be 'users'
+}
+
+// ==========================================
+// 2. CV / RESUME TABLE
+// ==========================================
+model CV {
+  id            String   @id @default(cuid())
+  
+  // Link to User
+  userId        String   @unique // Unique constraint ensures 1-to-1 relation
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // JSON Data Fields (High Priority)
+  personalInfo  Json     // { fullName, email, phone, linkedin, github }
+  summary       String?  @db.Text
+  skills        Json     // Array of strings e.g. ["Python", "React"]
+  projects      Json     // Array of objects { title, role, techStack, description }
+  education     Json     // Array of objects { degree, institution, year }
+  experience    Json?    // Optional Array
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("cvs")
+}
+
+// ==========================================
+// 3. INTERVIEW SESSION TABLE (The "Folder")
+// ==========================================
+model InterviewSession {
+  // Aapki requirement ke mutabiq session_id hi Primary Key hai
+  session_id    String   @id @unique
+  
+  // Link to User
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  fieldid       String   @db.VarChar(50) // e.g. "AI Engineer"
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  chunks        InterviewChunk[] // One Session has Many Chunks (Questions)
+  report        FinalReport?     // One Session has One Final Report
+
+  @@map("interview_sessions")
+}
+
+// ==========================================
+// 4. INTERVIEW CHUNKS TABLE (Per Question)
+// ==========================================
+model InterviewChunk {
+  id                  Int      @id @default(autoincrement()) // Unique ID for the chunk itself
+  
+  // Link to Session
+  session_id          String
+  session             InterviewSession @relation(fields: [session_id], references: [session_id], onDelete: Cascade)
+
+  question_id         String   @db.VarChar(10) // e.g. "Q1"
+
+  // 🧠 NLP Analysis Data
+  nlp_full_json       Json?    
+  transcript          String?  @db.Text
+  speech_metrics      Json?    
+  linguistic_metrics  Json?    
+  phase1_score        Float?
+  prosodic_confidence Float?
+
+  // 👁️ CV Analysis Data
+  cv_full_json        Json?
+  head_movement       Json?
+  eye_gaze            Json?
+  facial_expression   Json?
+  cv_score            Float?
+
+  created_at          DateTime @default(now())
+
+  @@map("interview_chunks")
+}
+
+// ==========================================
+// 5. FINAL REPORT TABLE (Summary)
+// ==========================================
+model FinalReport {
+  id            Int      @id @default(autoincrement())
+  
+  // Link to Session (One-to-One)
+  session_id    String   @unique
+  session       InterviewSession @relation(fields: [session_id], references: [session_id], onDelete: Cascade)
+  
+  // Link to User
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // AI Output
+  nlp_aggregate Json     // Stores WPM, Fillers, etc.
+  cv_aggregate  Json     // Stores Eye Contact, etc.
+  ai_feedback   String   @db.Text
+  
+  created_at    DateTime @default(now())
+
+  @@map("final_reports")
+}

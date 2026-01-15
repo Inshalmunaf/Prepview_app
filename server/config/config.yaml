@@ -1,0 +1,19 @@
+# Temporary storage paths
+artifacts_root: artifacts
+temp_video_path: temp_uploads
+
+database:
+  drivername: "postgresql"
+  host: "localhost"       # Ya Render/AWS ka host
+  port: 5432
+  username: "postgres"    # Aapka DB username
+  password: "yourpassword" # Aapka DB password
+  database: "prepview_db"
+
+#Training - Confidence Model
+confidence_model_training:
+  # Example: Agar aapne root folder mai 'data/RAVDESS' naam ka folder banaya hai
+  root_dir: artifacts/confidence_model_training
+  dataset_path: data/RAVDESS_dataset 
+  model_save_path: artifacts/models/confidence_model.pkl
+  scaler_save_path: artifacts/models/confidence_scaler.pkl

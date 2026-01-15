@@ -1,0 +1,165 @@
+# Model Parameters
+models:
+  stt_model_name: "openai/whisper-base"
+  sentiment_model_name: "distilbert-base-uncased-finetuned-sst-2-english"
+
+#Training - Confidence Model 
+confidence_model_params:
+  n_estimators: 100
+  random_state: 42
+  test_size: 0.2
+
+# Database Component
+database:
+  db_type: "postgresql"
+
+# NLP Analyzer Component
+nlp_analysis:
+  models:
+    whisper_model: "base"
+    whisper_language: "en"
+    spacy_model: "en_core_web_sm"
+    transformer_model: "all-MiniLM-L6-v2"
+  
+  processing:
+    pause_threshold: 0.4  # Seconds to consider a gap a "pause"
+
+  # Scoring Thresholds & Penalties (Phase 1 Quality Score)
+  scoring:
+    # 1. Speech Fluency
+    wpm_min: 90
+    wpm_max: 180
+    wpm_strict_min: 100
+    wpm_strict_max: 160
+    penalty_wpm_high: 10
+    penalty_wpm_med: 5
+    
+    rhythm_stability_high: 0.35
+    rhythm_stability_med: 0.25
+    penalty_rhythm_high: 8
+    penalty_rhythm_med: 4
+
+    # 2. Pause & Hesitation
+    pause_ratio_high: 0.30
+    pause_ratio_med: 0.20
+    penalty_pause_ratio_high: 12
+    penalty_pause_ratio_med: 6
+    
+    avg_pause_high: 1.5
+    avg_pause_med: 1.0
+    penalty_avg_pause_high: 6
+    penalty_avg_pause_med: 3
+    
+    filler_rate_high: 0.12
+    filler_rate_med: 0.08
+    penalty_filler_high: 7
+    penalty_filler_med: 4
+
+    # 3. Linguistic Clarity
+    lexical_richness_low: 0.30
+    lexical_richness_med: 0.40
+    penalty_lexical_high: 12
+    penalty_lexical_med: 6
+    
+    repetition_ratio_high: 0.25
+    repetition_ratio_med: 0.18
+    penalty_repetition_high: 8
+    penalty_repetition_med: 4
+
+    # 4. Structural Stability
+    sentence_length_std_high: 6
+    sentence_length_std_med: 4
+    penalty_sent_std_high: 6
+    penalty_sent_std_med: 3
+    
+    aux_verb_ratio_high: 0.12
+    penalty_aux_verb: 4
+    
+    semantic_instability_high: 0.40
+    semantic_instability_med: 0.30
+    penalty_semantic_high: 6
+    penalty_semantic_med: 3
+
+    
+
+# CV Analyzer Component
+cv_analysis:
+  general:
+    min_detection_confidence: 0.5
+    min_tracking_confidence: 0.5
+    video_fps_fallback: 30.0
+
+  head_movement:
+    movement_threshold_px: 4          # Min pixels to count as movement
+    facing_threshold: 20              # Ear distance diff to detect turning
+    pitch_neutral_pct: 0.15           # 15% deviation for Up/Down
+    smoothing_window: 3               # Frame window for jitter reduction
+    major_event_duration: 2.0         # Seconds to count as a "Major Distraction"
+    time_gap_tolerance: 0.2           # Seconds to bridge small gaps in events
+    
+  eye_gaze:
+    calibration_duration: 3.0         # Seconds to scan baseline eyes
+    movement_threshold: 0.004         # Normalized distance deviation
+    min_event_duration: 0.6           # Seconds to register a gaze shift
+    up_sensitivity_multiplier: 0.2    # Lower value makes "Looking Up" easier to detect
+
+  expression:
+    calibration_frames: 20            # Frames to scan for neutral face
+    frame_skip: 3                     # Analyze every 3rd frame to save CPU
+    
+    # Universal Emotion Thresholds
+    thresh_happy: 0.52
+    thresh_surprise: 0.12
+    
+    # Nervousness Sensitivity (Multipliers applied to Baseline)
+    # 0.75 means: If lip thickness drops to 75% of normal, flag as compressed.
+    sensitivity_lip_thickness: 0.75   
+    sensitivity_brow_squeeze: 0.93    
+    sensitivity_brow_drop: 0.93       
+    
+    # Fallback Defaults (Used if calibration fails)
+    default_lip_thickness: 0.025
+    default_brow_squeeze: 0.33
+    default_brow_drop: 0.35
+
+# Report Generation Component
+
+report_generation:
+  llm:
+    provider: "ollama"
+    model_name: "llama3.2"  # Ya jo model aapke paas installed ho (mistral, llama3, etc)
+    base_url: "http://localhost:11434/api/generate"
+    temperature: 0.7
+    max_tokens: 1000
+
+  prompts:
+    system_role: |
+      You are 'PrepView AI', an expert Interview Coach. You are analytical, encouraging, but brutally honest when needed.
+      Your goal is to analyze the candidate's metrics and provide a structured, actionable report.
+      ALWAYS quote the specific numbers provided to justify your feedback.
+
+    user_template: |
+      **Candidate Performance Metrics:**
+
+      ###VISUAL PRESENCE (Body Language)
+      - **Overall CV Score:** {avg_cv_score}/100
+      - **Eye Contact:** {avg_eye_contact}% (Target: >70%)
+      - **Nervousness Detected:** {avg_nervousness}%
+      - **Dominant Mood:** {dominant_mood}
+
+      ###VERBAL DELIVERY (Speech & Content)
+      - **Overall NLP Quality:** {avg_nlp_score}/100
+      - **Pace:** {avg_wpm} WPM (Ideal: 120-150)
+      - **Fluency:** Used filler words {avg_filler_rate} times/min (Target: < 4)
+
+      ###WEAKEST LINK ANALYSIS
+      The candidate struggled most on Question **{weakest_answer_id}**.
+      - **Combined Poor Score:** {lowest_combined_score}/100
+      - **What they said:** "{transcript_sample}..."
+
+      ###GENERATE REPORT (Markdown Format)
+      Write a response covering:
+      1. **Executive Summary:** A 3-sentence verdict based on the Scores.
+      2. **Strengths:** Mention 2 metrics where they performed well.
+      3. **Critical Weakness:** Analyze the "Weakest Link" transcript. Why did they fail here?
+      4. **Actionable Tip:** One specific exercise to improve the lowest metric.

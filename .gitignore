@@ -1,0 +1,22 @@
+# 1. Client Folder ki ENV
+client/.env
+
+# 2. Client ke andar Backend ki ENV
+client/backend/.env
+
+# 3. Server Folder ki ENV
+server/.env
+
+# ⚠️ ZAROORI: Node Modules ko bhi ignore karein (warna upload bohot heavy hoga)
+**/node_modules
+
+server/artifacts
+server/__pycache__/
+*.pyc
+
+client/uploads
+client/backend/uploads
+
+.vscode
+
+server/prepview_app/
