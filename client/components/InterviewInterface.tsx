@@ -38,51 +38,66 @@ export default function InterviewInterface({ fieldId }: InterviewInterfaceProps)
   const videoRef = useRef<HTMLVideoElement>(null)
   const smallVideoRef = useRef<HTMLVideoElement>(null)
   const [isRecording, setIsRecording] = useState(false)
-  const [recorderChunks, setRecorderChunks] = useState<Blob[]>([])
+  
+  // ⚡ CHANGE 1: State ki jagah Ref use karein (Fast & Synchronous)
+  const mediaChunksRef = useRef<Blob[]>([]); 
+  
   const [sessionId, setSessionId] = useState<string | null>(null)
   const [isStopped, setIsStopped] = useState(false)
-  const [questions, setQuestion] = useState<any[]>([]) // Added type safety for array
+  const [questions, setQuestion] = useState<any[]>([]) 
 
-  // 👇👇👇 --- NEW AI SPEAKING LOGIC STARTS HERE --- 👇👇👇
+  // 👇👇👇 --- UPDATED AI SPEAKING LOGIC --- 👇👇👇
 
-  // 1. Function to Speak Text
-  const speakQuestion = (text: string) => {
+  const speakQuestion = (text: string, onComplete?: () => void) => {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      // Stop any previous speech
-      window.speechSynthesis.cancel();
+      window.speechSynthesis.cancel(); 
 
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'en-US';
-      utterance.rate = 0.9; // Thora slow taakay clear ho
+      utterance.rate = 0.9;
       utterance.pitch = 1;
 
+      utterance.onend = () => {
+        if (onComplete) onComplete();
+      };
+
+      utterance.onerror = () => {
+        if (onComplete) onComplete();
+      };
+
       window.speechSynthesis.speak(utterance);
+    } else {
+        if (onComplete) onComplete();
     }
   };
 
-  // 2. Trigger Speech when Question Changes
   useEffect(() => {
-    // Sirf tab bole jab Interview Start ho aur Questions load ho chukay hon
-    if (isInterviewStarted && questions.length > 0) {
-      // Current Question nikalen (Array 0-index hai, Question 1-index hai)
+    if (isInterviewStarted && questions.length > 0 && mediaStream) {
+      
       const currentQ = questions[currentQuestion - 1];
       
       if (currentQ) {
-        // AI Title aur Description dono bolega
+        if (recorder && recorder.state === 'recording') {
+            recorder.pause();
+        }
+
         const textToRead = `${currentQ.question}. ${currentQ.description}`;
-        speakQuestion(textToRead);
+        
+        speakQuestion(textToRead, () => {
+             console.log("🤖 AI finished speaking. Starting Recording...");
+             startRecordingProcess(mediaStream);
+        });
       }
     }
 
-    // Cleanup: Agar user page chorr de to chup karao
     return () => {
       if (typeof window !== 'undefined') {
         window.speechSynthesis.cancel();
       }
     };
-  }, [currentQuestion, isInterviewStarted, questions]);
+  }, [currentQuestion, isInterviewStarted, questions, mediaStream]);
 
-  // 👆👆👆 --- NEW AI SPEAKING LOGIC ENDS HERE --- 👆👆👆
+  // 👆👆👆 --- LOGIC ENDS HERE --- 👆👆👆
 
   const startInterview = async () => {
     try {
@@ -104,7 +119,6 @@ export default function InterviewInterface({ fieldId }: InterviewInterfaceProps)
       setSessionId(sessionData.sessionId)
       setQuestion(sessionData.questions);
 
-      // Start Camera
       const stream = await navigator.mediaDevices.getUserMedia({
         video: true,
         audio: true,
@@ -114,10 +128,7 @@ export default function InterviewInterface({ fieldId }: InterviewInterfaceProps)
       if (videoRef.current) videoRef.current.srcObject = stream
       if (smallVideoRef.current) smallVideoRef.current.srcObject = stream
 
-      // Start Recording Logic
-      startRecordingProcess(stream)
-      
-      setIsInterviewStarted(true)
+      setIsInterviewStarted(true) 
     } catch (error) {
       console.error('Error starting interview:', error)
       alert('Could not start interview. Please check permissions.')
@@ -125,8 +136,8 @@ export default function InterviewInterface({ fieldId }: InterviewInterfaceProps)
   }
 
   const startRecordingProcess = (stream: MediaStream) => {
-    const chunks: Blob[] = []
-    setRecorderChunks(chunks)
+    // ⚡ CHANGE 2: Ref ko reset karein
+    mediaChunksRef.current = [];
 
     const mediaRecorder = new MediaRecorder(stream, {
       mimeType: 'video/webm;codecs=vp8,opus',
@@ -134,17 +145,15 @@ export default function InterviewInterface({ fieldId }: InterviewInterfaceProps)
 
     mediaRecorder.ondataavailable = (event) => {
       if (event.data && event.data.size > 0) {
-        chunks.push(event.data)
-        setRecorderChunks((prev) => [...prev, event.data])
+        // ⚡ CHANGE 3: Direct Ref mein push karein (No State Delay)
+        mediaChunksRef.current.push(event.data);
       }
     }
 
-    mediaRecorder.onstop = async () => {
-       // Logic handled in stopRecording
-    }
-
+    // Note: onstop logic hum stopRecording function mein handle karenge promise ke zariye
+    
     setRecorder(mediaRecorder)
-    mediaRecorder.start(1000)
+    mediaRecorder.start(1000) // Collect chunks every 1 second
     setIsRecording(true)
     setIsStopped(false)
   }
@@ -152,14 +161,25 @@ export default function InterviewInterface({ fieldId }: InterviewInterfaceProps)
   const stopRecording = async () => {
     if (!recorder || !isRecording || !sessionId) return
 
-    recorder.stop()
     setIsRecording(false)
     setIsUploading(true) 
 
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    // ⚡ CHANGE 4: Promise-based Stop (Wait for REAL stop event)
+    // Ye ensure karega ke saara data aa chuka hai
+    await new Promise<void>((resolve) => {
+        recorder.onstop = () => resolve();
+        recorder.stop();
+    });
 
-    const blob = new Blob(recorderChunks, { type: 'video/webm' })
+    // Thora sa extra buffer safety ke liye
+    // (Optional but good for slow computers)
+    await new Promise(r => setTimeout(r, 500));
+
+    // ⚡ CHANGE 5: Ref se Blob banayen
+    const blob = new Blob(mediaChunksRef.current, { type: 'video/webm' })
     
+    console.log(`📹 Video Size: ${blob.size} bytes`); // Debugging ke liye
+
     if (blob.size > 0) {
       const formData = new FormData()
       formData.append('video', blob, `question-${currentQuestion}.webm`)
@@ -192,6 +212,7 @@ export default function InterviewInterface({ fieldId }: InterviewInterfaceProps)
         setIsStopped(true)
       }
     } else {
+        console.error("❌ Blob size is 0, nothing recorded!");
         setIsUploading(false)
         setIsStopped(true)
     }
@@ -223,13 +244,12 @@ export default function InterviewInterface({ fieldId }: InterviewInterfaceProps)
       setCode('// Write your code here\n')
       setOutput('')
       setIsStopped(false)
-      setRecorderChunks([]) 
+      
+      // Clear chunks ref
+      mediaChunksRef.current = [];
+      setIsRecording(false) 
 
-      if (mediaStream) {
-        startRecordingProcess(mediaStream)
-      }
     } else {
-      // Finish Interview fallback logic
       if (mediaStream) {
         mediaStream.getTracks().forEach((track) => track.stop())
       }
@@ -280,7 +300,6 @@ export default function InterviewInterface({ fieldId }: InterviewInterfaceProps)
     }
   }
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (mediaStream) {

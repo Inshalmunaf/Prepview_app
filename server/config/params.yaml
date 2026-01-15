@@ -126,11 +126,11 @@ cv_analysis:
 
 report_generation:
   llm:
-    provider: "ollama"
-    model_name: "llama3.2"  # Ya jo model aapke paas installed ho (mistral, llama3, etc)
-    base_url: "http://localhost:11434/api/generate"
-    temperature: 0.7
-    max_tokens: 1000
+    provider: "groq"
+    model_name: "llama-3.3-70b-versatile"  # Best model for analysis
+    base_url: "https://api.groq.com/openai/v1/chat/completions"
+    temperature: 0.6
+    max_tokens: 1500
 
   prompts:
     system_role: |

@@ -316,91 +316,153 @@ class CVAnalyzerComponent:
     # 2. EYE GAZE LOGIC
     # ==========================================================
     def _analyze_eye_gaze(self):
-        logger.info("Starting Eye Gaze Analysis...")
+        logger.info("Starting Eye Gaze Analysis (Single Pass Strategy)...")
         
-        # Load from config
-        calibration_time = self.config.eye_calibration_time
-        movement_threshold = self.config.eye_movement_threshold
-        min_event_duration = self.config.eye_min_event_duration
-        UP_SENSITIVITY = self.config.eye_up_sensitivity_multiplier
+        # Load Config
+        calibration_time = getattr(self.config, 'eye_calibration_time', 2.0)
+        movement_threshold = getattr(self.config, 'eye_movement_threshold', 0.015)
+        min_event_duration = getattr(self.config, 'eye_min_event_duration', 0.1)
+        UP_SENSITIVITY = getattr(self.config, 'eye_up_sensitivity_multiplier', 1.5)
 
         cap = cv2.VideoCapture(self.video_path)
-        fps = cap.get(cv2.CAP_PROP_FPS) or self.config.video_fps_fallback
+        fps = cap.get(cv2.CAP_PROP_FPS)
+        if not fps or fps == 0: fps = 30.0
 
+        # Landmarks Indices
         LEFT_EYE = [33, 133]
         RIGHT_EYE = [362, 263]
         LEFT_IRIS = [468, 469, 470, 471]
         RIGHT_IRIS = [472, 473, 474, 475]
 
-        dx_vals, dy_vals = [] , []
+        # Raw Data Storage (Sab kuch yahan store karenge, phir baad mein process karenge)
+        raw_gaze_data = [] 
         frame_idx = 0
+
         def avg(lm, ids, w, h):
             return np.mean([(lm[i].x * w, lm[i].y * h) for i in ids], axis=0)
 
-        with self.mp_face_mesh.FaceMesh(refine_landmarks=True) as face_mesh:
-            # Pass 1: Calibration
-            while cap.isOpened():
-                ret, frame = cap.read()
-                if not ret or (frame_idx/fps) > calibration_time: break
-                h, w, _ = frame.shape
-                rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                res = face_mesh.process(rgb)
-                if res.multi_face_landmarks:
-                    lm = res.multi_face_landmarks[0].landmark
-                    eye = (avg(lm, LEFT_EYE, w, h) + avg(lm, RIGHT_EYE, w, h)) / 2
-                    iris = (avg(lm, LEFT_IRIS, w, h) + avg(lm, RIGHT_IRIS, w, h)) / 2
-                    dx_vals.append((iris[0] - eye[0]) / w)
-                    dy_vals.append((iris[1] - eye[1]) / h)
-                frame_idx += 1
-
-            if not dx_vals: 
-                cap.release()
-                return {"eye_contact_percentage": 0, "major_movements": [], "timeline": []}
-                
-            base_dx, base_dy = np.mean(dx_vals), np.mean(dy_vals)
-
-            # Pass 2: Analysis
-            cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
-            events, current_state, state_start = [], None, 0
-            total_time, total_center = 0, 0
-            frame_idx = 0
-
+        # Initialize FaceMesh (Low confidence to detect faces easily)
+        with self.mp_face_mesh.FaceMesh(
+            refine_landmarks=True,
+            min_detection_confidence=0.3, 
+            min_tracking_confidence=0.3
+        ) as face_mesh:
+            
+            # --- SINGLE PASS LOOP (Video Rewind nahi hogi) ---
             while cap.isOpened():
                 ret, frame = cap.read()
                 if not ret: break
+
                 h, w, _ = frame.shape
+                # Performance Optimization
+                frame.flags.writeable = False 
                 rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 res = face_mesh.process(rgb)
+
+                current_time = frame_idx / fps
                 
-                direction = "center"
                 if res.multi_face_landmarks:
                     lm = res.multi_face_landmarks[0].landmark
-                    eye = (avg(lm, LEFT_EYE, w, h) + avg(lm, RIGHT_EYE, w, h)) / 2
-                    iris = (avg(lm, LEFT_IRIS, w, h) + avg(lm, RIGHT_IRIS, w, h)) / 2
-                    dx = (iris[0] - eye[0]) / w - base_dx
-                    dy = (iris[1] - eye[1]) / h - base_dy
                     
-                    thresh_y = movement_threshold * UP_SENSITIVITY if dy < 0 else movement_threshold
-                    if not (abs(dx) < movement_threshold and abs(dy) < thresh_y):
-                        norm_dy = dy / UP_SENSITIVITY if dy < 0 else dy
-                        if abs(dx) > abs(norm_dy): direction = "right" if dx > 0 else "left"
-                        else: direction = "down" if dy > 0 else "up"
+                    # Calculate Coordinates
+                    eye_l = avg(lm, LEFT_EYE, w, h)
+                    eye_r = avg(lm, RIGHT_EYE, w, h)
+                    iris_l = avg(lm, LEFT_IRIS, w, h)
+                    iris_r = avg(lm, RIGHT_IRIS, w, h)
+
+                    eye_center = (eye_l + eye_r) / 2
+                    iris_center = (iris_l + iris_r) / 2
+
+                    # Normalized Relative Position (0 to 1 scale)
+                    dx = (iris_center[0] - eye_center[0]) / w
+                    dy = (iris_center[1] - eye_center[1]) / h
+                    
+                    # Store data for post-processing
+                    raw_gaze_data.append({
+                        "time": current_time,
+                        "dx": dx,
+                        "dy": dy
+                    })
                 
-                t = frame_idx / fps
-                if direction != current_state:
-                    if current_state:
-                        dur = t - state_start
-                        total_time += dur
-                        if current_state == "center": total_center += dur
-                        if dur >= min_event_duration:
-                            events.append({"timestamp": f"{state_start:.1f}s-{t:.1f}s", "direction": current_state})
-                    current_state, state_start = direction, t
                 frame_idx += 1
+        
         cap.release()
 
-        pct = round((total_center / total_time * 100), 2) if total_time > 0 else 0
-        return {"eye_contact_percentage": pct, "major_movements": [e for e in events if e['direction']!='center'], "timeline": events}
+        # --- POST PROCESSING (Memory mein calculation) ---
+        if not raw_gaze_data:
+            logger.warning("No face detected for Eye Analysis.")
+            return {"eye_contact_percentage": 0, "major_movements": [], "timeline": []}
 
+        # 1. Calibration: Shuru ke kuch seconds ka average nikalen
+        calibration_samples = [d for d in raw_gaze_data if d['time'] <= calibration_time]
+        
+        if not calibration_samples:
+            # Agar video bohot choti hai, toh saaray data ko hi calibration maan lo
+            calibration_samples = raw_gaze_data
+        
+        base_dx = np.mean([d['dx'] for d in calibration_samples])
+        base_dy = np.mean([d['dy'] for d in calibration_samples])
+
+        # 2. Analysis: Ab har frame ko Base se compare karein
+        events = []
+        current_state = "center"
+        state_start = 0
+        total_time = 0
+        total_center = 0
+
+        # Loop through stored data
+        for i, data in enumerate(raw_gaze_data):
+            # Deviation from Base
+            dev_dx = data['dx'] - base_dx
+            dev_dy = data['dy'] - base_dy
+            
+            # Logic for Movement
+            thresh_y = movement_threshold * UP_SENSITIVITY if dev_dy < 0 else movement_threshold
+            
+            direction = "center"
+            is_moving_x = abs(dev_dx) > movement_threshold
+            is_moving_y = abs(dev_dy) > thresh_y
+
+            if is_moving_x or is_moving_y:
+                norm_dy = dev_dy / UP_SENSITIVITY if dev_dy < 0 else dev_dy
+                if abs(dev_dx) > abs(norm_dy): 
+                    direction = "right" if dev_dx > 0 else "left"
+                else: 
+                    direction = "down" if dev_dy > 0 else "up"
+
+            # Event Tracking
+            t = data['time']
+            if direction != current_state:
+                dur = t - state_start
+                # Jitter filter
+                if dur >= min_event_duration:
+                    total_time += dur
+                    if current_state == "center":
+                        total_center += dur
+                    else:
+                        events.append({"timestamp": f"{state_start:.1f}s-{t:.1f}s", "direction": current_state})
+                    
+                    current_state = direction
+                    state_start = t
+        
+        # Handle Last Segment
+        if raw_gaze_data:
+            final_t = raw_gaze_data[-1]['time']
+            dur = final_t - state_start
+            total_time += dur
+            if current_state == "center":
+                total_center += dur
+            elif dur >= min_event_duration:
+                events.append({"timestamp": f"{state_start:.1f}s-end", "direction": current_state})
+
+        # Calculate Final Score
+        pct = round((total_center / total_time * 100), 2) if total_time > 0 else 0
+        
+        return {
+            "eye_contact_percentage": pct, 
+            "major_movements": [e for e in events if e['direction'] != 'center'], 
+            "timeline": events
+        }
 
     def nonverbal_score(self,expression, eye_gaze, head_movement):
         """
