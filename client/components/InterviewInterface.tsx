@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import axios from 'axios';
 
-
 const MonacoEditor = dynamic(() => import('@monaco-editor/react'), { ssr: false })
 
 interface InterviewInterfaceProps {
@@ -34,7 +33,6 @@ export default function InterviewInterface({ fieldId }: InterviewInterfaceProps)
   const [output, setOutput] = useState('')
   const [isRunning, setIsRunning] = useState(false)
   
-  // ✅ CHANGE: Uploading state add kiya taakay user wait kare
   const [isUploading, setIsUploading] = useState(false)
   
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -43,7 +41,48 @@ export default function InterviewInterface({ fieldId }: InterviewInterfaceProps)
   const [recorderChunks, setRecorderChunks] = useState<Blob[]>([])
   const [sessionId, setSessionId] = useState<string | null>(null)
   const [isStopped, setIsStopped] = useState(false)
-  const [questions, setQuestion] = useState([])
+  const [questions, setQuestion] = useState<any[]>([]) // Added type safety for array
+
+  // 👇👇👇 --- NEW AI SPEAKING LOGIC STARTS HERE --- 👇👇👇
+
+  // 1. Function to Speak Text
+  const speakQuestion = (text: string) => {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      // Stop any previous speech
+      window.speechSynthesis.cancel();
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-US';
+      utterance.rate = 0.9; // Thora slow taakay clear ho
+      utterance.pitch = 1;
+
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
+  // 2. Trigger Speech when Question Changes
+  useEffect(() => {
+    // Sirf tab bole jab Interview Start ho aur Questions load ho chukay hon
+    if (isInterviewStarted && questions.length > 0) {
+      // Current Question nikalen (Array 0-index hai, Question 1-index hai)
+      const currentQ = questions[currentQuestion - 1];
+      
+      if (currentQ) {
+        // AI Title aur Description dono bolega
+        const textToRead = `${currentQ.question}. ${currentQ.description}`;
+        speakQuestion(textToRead);
+      }
+    }
+
+    // Cleanup: Agar user page chorr de to chup karao
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, [currentQuestion, isInterviewStarted, questions]);
+
+  // 👆👆👆 --- NEW AI SPEAKING LOGIC ENDS HERE --- 👆👆👆
 
   const startInterview = async () => {
     try {
@@ -85,7 +124,6 @@ export default function InterviewInterface({ fieldId }: InterviewInterfaceProps)
     }
   }
 
-  // ✅ CHANGE: Helper function to init recorder
   const startRecordingProcess = (stream: MediaStream) => {
     const chunks: Blob[] = []
     setRecorderChunks(chunks)
@@ -97,15 +135,12 @@ export default function InterviewInterface({ fieldId }: InterviewInterfaceProps)
     mediaRecorder.ondataavailable = (event) => {
       if (event.data && event.data.size > 0) {
         chunks.push(event.data)
-        setRecorderChunks((prev) => [...prev, event.data]) // Better state update
+        setRecorderChunks((prev) => [...prev, event.data])
       }
     }
 
-    // ✅ CHANGE: Upload Logic moved inside onstop to ensure full video
     mediaRecorder.onstop = async () => {
-        // We handle the actual upload in stopRecording function manually 
-        // to have better control over async/await, 
-        // but technically the blob construction should happen after this event.
+       // Logic handled in stopRecording
     }
 
     setRecorder(mediaRecorder)
@@ -119,21 +154,16 @@ export default function InterviewInterface({ fieldId }: InterviewInterfaceProps)
 
     recorder.stop()
     setIsRecording(false)
-    setIsUploading(true) // Start loading
+    setIsUploading(true) 
 
-    // ✅ CHANGE: Wait slightly longer to ensure 'ondataavailable' fires for the last chunk
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
-    // Construct Blob
-    // Note: We use the local 'recorderChunks' state which should be updated
     const blob = new Blob(recorderChunks, { type: 'video/webm' })
     
-    // Upload
     if (blob.size > 0) {
       const formData = new FormData()
       formData.append('video', blob, `question-${currentQuestion}.webm`)
       
-      // ✅ CHANGE: Sending "Q1", "Q2" format instead of "1", "2"
       formData.append('questionId', `Q${currentQuestion}`) 
       formData.append('fieldId', fieldId)
       formData.append('sessionId', sessionId)
@@ -158,7 +188,7 @@ export default function InterviewInterface({ fieldId }: InterviewInterfaceProps)
       } catch (error) {
         console.error('Error uploading video:', error)
       } finally {
-        setIsUploading(false) // Stop loading
+        setIsUploading(false) 
         setIsStopped(true)
       }
     } else {
@@ -166,54 +196,46 @@ export default function InterviewInterface({ fieldId }: InterviewInterfaceProps)
         setIsStopped(true)
     }
   }
+
   const handleFinishInterview = async () => {
     try {
-       
-        
         console.log("🏁 Finishing Interview...");
-
-        const token = localStorage.getItem('token'); // Token uthayen
+        const token = localStorage.getItem('token'); 
         
-        // 2. Node Backend API Call
         const response = await axios.post('http://localhost:5000/api/interview/finish-interview', {
-            sessionId: sessionId // Make sure ye variable aapke paas available ho
+            sessionId: sessionId 
         }, {
             headers: { Authorization: `Bearer ${token}` }
         });
 
         console.log("✅ Report Generated:", response.data);
-
-        // 3. Success! User ko Result Page par bhej dein
         router.push(`/results/${sessionId}`);
 
     } catch (error) {
-        console.error("❌ Error finishing interview:", error);
+        console.error(" Error finishing interview:", error);
         alert("Report generation failed. Please try again.");
-    } finally {
-        // setIsUploading(false); // Agar error aye toh button wapis enable karein
-    }
-};
+    } 
+  };
+
   const handleNextQuestion = async () => {
     if (currentQuestion < totalQuestions) {
       setCurrentQuestion(currentQuestion + 1)
       setCode('// Write your code here\n')
       setOutput('')
       setIsStopped(false)
-      setRecorderChunks([]) // Clear old chunks
+      setRecorderChunks([]) 
 
-      // Start recording for next question
       if (mediaStream) {
         startRecordingProcess(mediaStream)
       }
     } else {
-      // Finish Interview
+      // Finish Interview fallback logic
       if (mediaStream) {
         mediaStream.getTracks().forEach((track) => track.stop())
       }
       
       const token = localStorage.getItem('token')
       try {
-        // ✅ CHANGE: Endpoint call (ensure backend has this route)
         await fetch('http://localhost:5000/api/interview/count', {
           headers: { Authorization: `Bearer ${token}` },
         })
@@ -267,9 +289,7 @@ export default function InterviewInterface({ fieldId }: InterviewInterfaceProps)
     }
   }, [mediaStream])
   
-  // Safe check: Agar array mein data hai tabhi uthao, warna null rakho
-
-const currentQuestionData = (questions && questions.length > 0) 
+  const currentQuestionData = (questions && questions.length > 0) 
   ? questions[currentQuestion - 1] 
   : { 
       question: "Welcome to PrepView AI", 
@@ -290,7 +310,7 @@ const currentQuestionData = (questions && questions.length > 0)
 
   return (
     <div className="min-h-screen bg-background text-text-primary">
-      {/* Navbar ... (No Changes) */}
+      {/* Navbar */}
       <nav className="bg-white border-b border-border px-6 py-4 shadow-sm">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
@@ -312,7 +332,7 @@ const currentQuestionData = (questions && questions.length > 0)
         </div>
       </nav>
 
-      {/* Main Layout ... (No Changes) */}
+      {/* Main Layout */}
       <div className="flex flex-col lg:flex-row h-[calc(100vh-80px)] pb-24">
         {/* Left Side */}
         <div className="w-full lg:w-1/2 flex flex-col p-6 space-y-6">
@@ -333,7 +353,7 @@ const currentQuestionData = (questions && questions.length > 0)
             </div>
           </div>
           <div className="bg-white rounded-xl p-8 border border-border flex items-center justify-center shadow-md">
-             {/* AI Animation ... */}
+            {/* AI Animation */}
             <div className="relative">
               <div className="w-48 h-48 rounded-full bg-gradient-to-br from-primary via-primary to-accent flex items-center justify-center shadow-2xl animate-pulse">
                 <div className="w-40 h-40 rounded-full bg-white flex items-center justify-center">
@@ -344,7 +364,7 @@ const currentQuestionData = (questions && questions.length > 0)
           </div>
         </div>
 
-        {/* Right Side (Monaco) ... (No Changes) */}
+        {/* Right Side (Monaco) */}
         <div className="w-full lg:w-1/2 flex flex-col p-6">
            <div className="bg-white rounded-xl border border-border overflow-hidden flex flex-col h-full shadow-md relative">
              {/* Header */}
@@ -419,7 +439,6 @@ const currentQuestionData = (questions && questions.length > 0)
               <div className="flex items-center space-x-2">
                 <div className={`w-3 h-3 rounded-full ${isRecording ? 'bg-red-500 animate-pulse' : 'bg-gray-400'}`}></div>
                 <span className="text-text-primary">
-                    {/* ✅ CHANGE: Loading Status Dikhayein */}
                   {isUploading ? 'Uploading & Analyzing...' : isRecording ? 'Recording...' : isStopped ? 'Stopped' : 'Paused'}
                 </span>
               </div>
