@@ -246,25 +246,39 @@ router.post('/finish-interview', verifyToken, async (req, res) => {
 });
 module.exports = router;
 // ==========================================
-// 3. GET SESSION RESULTS (From DB)
+// 3. GET SESSION RESULTS (Updated for Report)
 // ==========================================
-router.get('/results/:sessionId', verifyToken, async (req, res) => {
+router.get('/results/:sessionId', async (req, res) => {
   try {
     const { sessionId } = req.params;
 
-    // Fetch Chunks directly from Database (Populated by Python)
-    const chunks = await prisma.interviewChunk.findMany({
-      where: { session_id: sessionId },
-      orderBy: { question_id: 'asc' }
+    console.log("🔍 Searching FinalReport for Session:", sessionId);
+
+    // 👇 FIX: Model ka naam 'FinalReport' hai, toh 'prisma.finalReport' use hoga
+    const report = await prisma.finalReport.findFirst({
+      where: { 
+        session_id: sessionId // Schema mein yehi naam hai
+      }
     });
 
-    res.json({ sessionId, chunks });
+    if (!report) {
+      console.log(" Report not found in DB");
+      return res.status(404).json({ message: "Report abhi generate nahi hui" });
+    }
+
+    console.log("✅ Report Found ID:", report.id);
+
+    // Report ka data bhej dein
+    res.status(200).json({
+       success: true,
+       data: report 
+    });
+
   } catch (error) {
-    console.error('Get results error:', error);
-    res.status(500).json({ message: 'Error fetching results' });
+    console.error(' Database Error:', error);
+    res.status(500).json({ message: 'Server Error', error: error.message });
   }
 });
-
 // ==========================================
 // 4. CODE EXECUTION (No Changes Needed)
 // ==========================================
