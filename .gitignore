@@ -7,7 +7,7 @@ client/backend/.env
 # 3. Server Folder ki ENV
 server/.env
 
-# ⚠️ ZAROORI: Node Modules ko bhi ignore karein (warna upload bohot heavy hoga)
+#  Node Modules ko bhi ignore karein (warna upload bohot heavy hoga)
 **/node_modules
 
 server/artifacts

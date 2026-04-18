@@ -13,7 +13,7 @@ export const aiService = {
       const payload = {
         session_id: sessionId,
         question_id: questionId,
-        video_file_path: videoPath // ⚠️ Note: Ye File ka PATH mangta hai, File object nahi
+        video_file_path: videoPath //  Note: Ye File ka PATH mangta hai, File object nahi
       };
 
       const response = await axios.post(`${AI_API_URL}/analyze_chunk`, payload);

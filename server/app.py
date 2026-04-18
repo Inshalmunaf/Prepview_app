@@ -145,7 +145,7 @@ async def analyze_chunk(request: AnalyzeRequest, background_tasks: BackgroundTas
     }
 
 @app.post("/generate_finalreport")
-async def generate_finalreport(request: ReportRequest): # ❌ background_tasks hata diya
+async def generate_finalreport(request: ReportRequest): 
     """
     Ab hum User ko wait karwayenge taakay jab wo aglay page par jaye 
     toh Report DB mein majood ho.
