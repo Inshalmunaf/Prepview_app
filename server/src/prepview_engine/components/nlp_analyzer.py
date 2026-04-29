@@ -215,10 +215,208 @@ class NLPAnalyzerComponent:
             "semantic_instability": semantic_drift
         }
 
+
+    def prosodic_confidence(self,y, sr, duration):
+        """
+        Rule-based deterministic prosodic confidence scorer for interview audio.
+        
+        Parameters:
+            y        : np.ndarray  — audio time series (mono)
+            sr       : int         — sample rate
+            duration : float       — duration in seconds
+        
+        Returns:
+            dict with 'score' (0–100) and per-feature breakdown
+        """
+
+        # ------------------------------------------------------------------ #
+        #  SAFETY GUARDS                                                       #
+        # ------------------------------------------------------------------ #
+        if duration < 1.0 or len(y) < sr:
+            return {"score": 0, "reason": "Audio too short", "breakdown": {}}
+
+        scores = {}
+
+        # ================================================================== #
+        # 1. SPEECH RATE  (words-per-minute proxy via syllable detection)     #
+        #    Confident speech: 120–180 WPM  (≈2–3 syllables/sec)             #
+        #    Too fast → nervous; too slow → unsure                            #
+        # ================================================================== #
+        hop_length = 512
+        rms = librosa.feature.rms(y=y, hop_length=hop_length)[0]
+        rms_db = librosa.amplitude_to_db(rms + 1e-6)
+
+        # Rough syllable count: count RMS peaks above threshold
+        threshold = np.percentile(rms_db, 40)
+        above = (rms_db > threshold).astype(int)
+        syllable_crossings = np.sum(np.diff(above) == 1)
+        syllable_rate = syllable_crossings / duration  # syllables per second
+
+        if 2.0 <= syllable_rate <= 3.5:
+            scores["speech_rate"] = 100
+        elif 1.5 <= syllable_rate < 2.0 or 3.5 < syllable_rate <= 4.5:
+            scores["speech_rate"] = 70
+        elif 1.0 <= syllable_rate < 1.5 or 4.5 < syllable_rate <= 5.5:
+            scores["speech_rate"] = 40
+        else:
+            scores["speech_rate"] = 15
+
+        # ================================================================== #
+        # 2. PITCH (F0) STATISTICS                                            #
+        #    Confident speakers: moderate pitch, controlled variation         #
+        #    Pitch too flat   → monotone / robotic                           #
+        #    Pitch too erratic→ nervous / uncertain                          #
+        # ================================================================== #
+        f0, voiced_flag, _ = librosa.pyin(
+            y, fmin=librosa.note_to_hz("C2"), fmax=librosa.note_to_hz("C7"),
+            sr=sr, hop_length=hop_length
+        )
+        voiced_f0 = f0[voiced_flag & ~np.isnan(f0)]
+
+        if len(voiced_f0) < 10:
+            scores["pitch_variability"] = 30
+            scores["pitch_range"] = 30
+        else:
+            # Pitch variability (CoV = std/mean)
+            pitch_cov = np.std(voiced_f0) / (np.mean(voiced_f0) + 1e-6)
+            if 0.08 <= pitch_cov <= 0.25:
+                scores["pitch_variability"] = 100
+            elif 0.05 <= pitch_cov < 0.08 or 0.25 < pitch_cov <= 0.35:
+                scores["pitch_variability"] = 65
+            elif pitch_cov < 0.05:
+                scores["pitch_variability"] = 30   # monotone
+            else:
+                scores["pitch_variability"] = 40   # overly erratic
+
+            # Pitch range (semitone span)
+            p10, p90 = np.percentile(voiced_f0, 10), np.percentile(voiced_f0, 90)
+            semitone_range = 12 * np.log2((p90 + 1e-6) / (p10 + 1e-6))
+            if 4 <= semitone_range <= 14:
+                scores["pitch_range"] = 100
+            elif 2 <= semitone_range < 4 or 14 < semitone_range <= 20:
+                scores["pitch_range"] = 65
+            else:
+                scores["pitch_range"] = 30
+
+        # ================================================================== #
+        # 3. VOICED RATIO  (speech vs silence proportion)                     #
+        #    Too many pauses → hesitant; too few → no breathing room          #
+        # ================================================================== #
+        voiced_ratio = np.sum(voiced_flag) / (len(voiced_flag) + 1e-6)
+
+        if 0.55 <= voiced_ratio <= 0.85:
+            scores["voiced_ratio"] = 100
+        elif 0.40 <= voiced_ratio < 0.55 or 0.85 < voiced_ratio <= 0.92:
+            scores["voiced_ratio"] = 65
+        elif 0.25 <= voiced_ratio < 0.40:
+            scores["voiced_ratio"] = 35   # too many pauses
+        else:
+            scores["voiced_ratio"] = 20
+
+        # ================================================================== #
+        # 4. ENERGY CONSISTENCY  (RMS std / mean)                             #
+        #    Confident speakers maintain steady volume                         #
+        # ================================================================== #
+        rms_linear = librosa.feature.rms(y=y, hop_length=hop_length)[0]
+        energy_cov = np.std(rms_linear) / (np.mean(rms_linear) + 1e-6)
+
+        if 0.3 <= energy_cov <= 0.9:
+            scores["energy_consistency"] = 100
+        elif 0.15 <= energy_cov < 0.3 or 0.9 < energy_cov <= 1.2:
+            scores["energy_consistency"] = 65
+        elif energy_cov < 0.15:
+            scores["energy_consistency"] = 40   # whisper-flat
+        else:
+            scores["energy_consistency"] = 30   # very erratic volume
+
+        # ================================================================== #
+        # 5. PAUSE PATTERN  (long silence detection)                          #
+        #    Confident: few long pauses (>1.5 s); short pauses OK             #
+        # ================================================================== #
+        frame_duration = hop_length / sr          # seconds per frame
+        silence_threshold_db = np.percentile(rms_db, 25)
+        is_silent = rms_db < silence_threshold_db
+
+        # Find runs of silence
+        long_pause_count = 0
+        run_len = 0
+        long_pause_threshold_frames = int(1.5 / frame_duration)
+
+        for s in is_silent:
+            if s:
+                run_len += 1
+                if run_len == long_pause_threshold_frames:
+                    long_pause_count += 1
+            else:
+                run_len = 0
+
+        pauses_per_minute = long_pause_count / (duration / 60.0 + 1e-6)
+
+        if pauses_per_minute <= 2:
+            scores["pause_pattern"] = 100
+        elif pauses_per_minute <= 5:
+            scores["pause_pattern"] = 75
+        elif pauses_per_minute <= 9:
+            scores["pause_pattern"] = 45
+        else:
+            scores["pause_pattern"] = 20
+
+        # ================================================================== #
+        # 6. JITTER  (pitch micro-instability, proxy for vocal tremor)        #
+        #    Nervous/stressed speakers show more jitter                        #
+        # ================================================================== #
+        if len(voiced_f0) > 10:
+            f0_diff = np.abs(np.diff(voiced_f0))
+            jitter = np.mean(f0_diff) / (np.mean(voiced_f0) + 1e-6)
+            if jitter < 0.01:
+                scores["jitter"] = 100
+            elif jitter < 0.03:
+                scores["jitter"] = 75
+            elif jitter < 0.06:
+                scores["jitter"] = 50
+            else:
+                scores["jitter"] = 20
+        else:
+            scores["jitter"] = 40
+
+        # ================================================================== #
+        # 7. SPECTRAL CENTROID STABILITY  (timbre consistency)                #
+        #    Confident voice → stable brightness; anxious → erratic           #
+        # ================================================================== #
+        centroid = librosa.feature.spectral_centroid(y=y, sr=sr, hop_length=hop_length)[0]
+        centroid_cov = np.std(centroid) / (np.mean(centroid) + 1e-6)
+
+        if centroid_cov < 0.20:
+            scores["spectral_stability"] = 100
+        elif centroid_cov < 0.35:
+            scores["spectral_stability"] = 75
+        elif centroid_cov < 0.55:
+            scores["spectral_stability"] = 50
+        else:
+            scores["spectral_stability"] = 25
+
+        # ================================================================== #
+        # WEIGHTED AGGREGATION                                                 #
+        # ================================================================== #
+        weights = {
+            "speech_rate":        0.18,
+            "pitch_variability":  0.16,
+            "pitch_range":        0.12,
+            "voiced_ratio":       0.15,
+            "energy_consistency": 0.13,
+            "pause_pattern":      0.14,
+            "jitter":             0.07,
+            "spectral_stability": 0.05,
+        }
+
+        final_score = sum(scores[k] * weights[k] for k in weights)
+        final_score = round(min(max(final_score, 0), 100), 2)
+
+        return final_score
     # ==========================================================
-    # 🏆 SCORING SYSTEM (Config Driven)
+    # 🏆 SCORING SYSTEM 
     # ==========================================================
-    def _compute_phase1_quality_score(self, speech, linguistic):
+    def _compute_phase1_quality_score(self, speech, linguistic, prosodic_confidence):
         score = 100.0
         cfg = self.config # Short alias
 
@@ -277,9 +475,16 @@ class NLPAnalyzerComponent:
         elif linguistic["semantic_instability"] > cfg.semantic_instability_med:
             score -= cfg.penalty_semantic_med
 
+        # 5. Prosodic Confidence (Acoustic/DSP Impact)
+        # Assuming prosodic_confidence is a 0-100 float from your new function
+        if prosodic_confidence < cfg.prosodic_confidence_low:
+            score -= cfg.penalty_prosodic_high
+        elif prosodic_confidence < cfg.prosodic_confidence_med:
+            score -= cfg.penalty_prosodic_med
+
         return round(max(0, min(score, 100)), 1)
 
-    # ==========================================================
+# ==========================================================
     # 🚀 MAIN RUNNER
     # ==========================================================
     def run(self, audio_path_str: str):
@@ -294,7 +499,7 @@ class NLPAnalyzerComponent:
 
         try:
             # Load & Transcribe using instance variables
-            _, _, duration = self._load_audio()
+            y, sr, duration = self._load_audio()
             transcript = self._transcribe_audio()
             text = transcript.get("text", "").strip()
             
@@ -305,11 +510,13 @@ class NLPAnalyzerComponent:
             # Extract metrics
             speech_metrics, words = self._extract_speech_metrics(transcript, duration)
             linguistic_metrics = self._extract_linguistic_metrics(text)
+            prosodic_confidence_score = self.prosodic_confidence(y,sr,duration)
 
             # Compute Score
             phase1_score = self._compute_phase1_quality_score(
                 speech=speech_metrics,
-                linguistic=linguistic_metrics
+                linguistic=linguistic_metrics,
+                prosodic_confidence = prosodic_confidence_score
             )
 
             logger.info(f"NLP Analysis Complete. Score: {phase1_score}/100")
@@ -319,7 +526,7 @@ class NLPAnalyzerComponent:
                 "speech_metrics": speech_metrics,
                 "linguistic_metrics": linguistic_metrics,
                 "phase1_quality_score": phase1_score,
-                "prosodic_confidence": 0.0,
+                "prosodic_confidence": prosodic_confidence_score,
                 "phase": "phase_1",
                 "version": "v1.0"
             }

@@ -3,12 +3,6 @@ models:
   stt_model_name: "openai/whisper-base"
   sentiment_model_name: "distilbert-base-uncased-finetuned-sst-2-english"
 
-#Training - Confidence Model 
-confidence_model_params:
-  n_estimators: 100
-  random_state: 42
-  test_size: 0.2
-
 # Database Component
 database:
   db_type: "postgresql"
@@ -25,8 +19,11 @@ nlp_analysis:
     pause_threshold: 0.4  # Seconds to consider a gap a "pause"
 
   # Scoring Thresholds & Penalties (Phase 1 Quality Score)
+  # Scoring Thresholds & Penalties (Phase 1 Quality Score)
   scoring:
-    # 1. Speech Fluency
+    # ----------------------------------------------------
+    # 1. Speech Fluency (Max Penalty: 20)
+    # ----------------------------------------------------
     wpm_min: 90
     wpm_max: 180
     wpm_strict_min: 100
@@ -36,10 +33,12 @@ nlp_analysis:
     
     rhythm_stability_high: 0.35
     rhythm_stability_med: 0.25
-    penalty_rhythm_high: 8
-    penalty_rhythm_med: 4
+    penalty_rhythm_high: 10  # Adjusted from 8
+    penalty_rhythm_med: 5    # Adjusted from 4
 
-    # 2. Pause & Hesitation
+    # ----------------------------------------------------
+    # 2. Pause & Hesitation (Max Penalty: 25)
+    # ----------------------------------------------------
     pause_ratio_high: 0.30
     pause_ratio_med: 0.20
     penalty_pause_ratio_high: 12
@@ -55,7 +54,9 @@ nlp_analysis:
     penalty_filler_high: 7
     penalty_filler_med: 4
 
-    # 3. Linguistic Clarity
+    # ----------------------------------------------------
+    # 3. Linguistic Clarity (Max Penalty: 20)
+    # ----------------------------------------------------
     lexical_richness_low: 0.30
     lexical_richness_med: 0.40
     penalty_lexical_high: 12
@@ -66,7 +67,9 @@ nlp_analysis:
     penalty_repetition_high: 8
     penalty_repetition_med: 4
 
-    # 4. Structural Stability
+    # ----------------------------------------------------
+    # 4. Structural Stability (Max Penalty: 20)
+    # ----------------------------------------------------
     sentence_length_std_high: 6
     sentence_length_std_med: 4
     penalty_sent_std_high: 6
@@ -77,8 +80,16 @@ nlp_analysis:
     
     semantic_instability_high: 0.40
     semantic_instability_med: 0.30
-    penalty_semantic_high: 6
-    penalty_semantic_med: 3
+    penalty_semantic_high: 10  # Adjusted from 6
+    penalty_semantic_med: 5    # Adjusted from 3
+
+    # ----------------------------------------------------
+    # 5. NEW: Prosodic Confidence (Max Penalty: 15)
+    # ----------------------------------------------------
+    prosodic_confidence_low: 60.0
+    prosodic_confidence_med: 80.0
+    penalty_prosodic_high: 15
+    penalty_prosodic_med: 7
 
     
 

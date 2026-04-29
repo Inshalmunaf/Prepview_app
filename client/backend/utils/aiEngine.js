@@ -83,7 +83,7 @@ class AIInterviewEngine {
       return content.questions; 
 
     } catch (error) {
-      console.error("❌ Groq Generation Failed:", error);
+      console.error(" Groq Generation Failed:", error);
       
       // Fallback: Agar Internet issue ho ya API limit cross ho jaye
       return [

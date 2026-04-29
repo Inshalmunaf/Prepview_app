@@ -65,7 +65,7 @@ class DatabaseConnector:
                 speech_metrics=clean_nlp.get('speech_metrics', {}),
                 linguistic_metrics=clean_nlp.get('linguistic_metrics', {}),
                 phase1_score=float(clean_nlp.get('phase1_quality_score', 0.0)),
-                prosodic_confidence=float(clean_nlp.get('confidence', 0.0)),
+                prosodic_confidence=float(clean_nlp.get('prosodic_confidence', 0.0)),
 
                 # CV Data
                 cv_full_json=clean_cv, # Clean data save karo

@@ -83,6 +83,12 @@ class NLPConfig(BaseModel):
     penalty_semantic_high: int
     penalty_semantic_med: int
 
+    # Scoring - Prosodic Confidence 
+    prosodic_confidence_low: float
+    prosodic_confidence_med: float
+    penalty_prosodic_high: int
+    penalty_prosodic_med: int
+
 class ScoringConfig(BaseModel):
     gaze_good_threshold: int
     gaze_avg_threshold: int
@@ -266,7 +272,13 @@ class ConfigurationManager:
                 aux_verb_ratio_high=sc.aux_verb_ratio_high, penalty_aux_verb=sc.penalty_aux_verb,
                 
                 semantic_instability_high=sc.semantic_instability_high, semantic_instability_med=sc.semantic_instability_med,
-                penalty_semantic_high=sc.penalty_semantic_high, penalty_semantic_med=sc.penalty_semantic_med
+                penalty_semantic_high=sc.penalty_semantic_high, penalty_semantic_med=sc.penalty_semantic_med,
+
+                # Scoring - Prosodic 
+                prosodic_confidence_low = sc.prosodic_confidence_low,
+                prosodic_confidence_med = sc.prosodic_confidence_med,
+                penalty_prosodic_high = sc.penalty_prosodic_high,
+                penalty_prosodic_med = sc.penalty_prosodic_med
             )
         except Exception as e:
             logger.error(f"Error parsing NLP params: {e}")

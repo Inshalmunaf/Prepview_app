@@ -1,15 +1,18 @@
-[2026-04-19 00:13:53,706] - INFO - prepview_engine_logger - [START] Processing Chunk: Q4 for Session: session-1776538715277-l2mi19j0l
-[2026-04-19 00:13:53,710] - INFO - prepview_engine_logger - Step 1: Extracting Audio...
-[2026-04-19 00:13:53,713] - INFO - prepview_engine_logger - --- Processing Video: cmo4p4dqw0000mpdk8t1zrx0q_unknown_1776539633583-730135815.webm ---
-[2026-04-19 00:13:53,966] - ERROR - prepview_engine_logger - Pipeline Crashed for Q4: Error passing `ffmpeg -i` command output:
-
-Input #0, matroska,webm, from 'C:\Users\Inshal Munaf\Desktop\prepview_app\client\uploads\videos\cmo4p4dqw0000mpdk8t1zrx0q_unknown_1776539633583-730135815.webm':
-  Metadata:
-    encoder         : Chrome
-  Duration: N/A, start: 0.000000, bitrate: N/A
-  Stream #0:0(eng): Video: vp8, yuv420p(progressive), 640x480, SAR 1:1 DAR 4:3, 1k tbr, 1k tbn (default)
-      Metadata:
-        alpha_mode      : 1
-  Stream #0:1(eng): Audio: opus, 48000 Hz, mono, fltp (default)
-At least one output file must be specified
-
+[2026-04-29 23:19:28,288] - INFO - prepview_engine_logger - [START] Processing Chunk: Q2 for Session: session-1777486333968-xgaw8brt1
+[2026-04-29 23:19:28,290] - INFO - prepview_engine_logger - Step 1: Extracting Audio...
+[2026-04-29 23:19:28,294] - INFO - prepview_engine_logger - --- Processing Video: cmo4p4dqw0000mpdk8t1zrx0q_unknown_1777486768143-896608433.webm ---
+[2026-04-29 23:19:28,297] - INFO - prepview_engine_logger - Starting audio extraction for: cmo4p4dqw0000mpdk8t1zrx0q_unknown_1777486768143-896608433.webm
+[2026-04-29 23:19:28,677] - INFO - prepview_engine_logger - Audio saved to: artifacts\temp_uploads\cmo4p4dqw0000mpdk8t1zrx0q_unknown_1777486768143-896608433_audio.wav
+[2026-04-29 23:19:28,679] - INFO - prepview_engine_logger - Step 2: Running CV Analysis...
+[2026-04-29 23:19:28,681] - INFO - prepview_engine_logger - --- Starting CV Analysis for: cmo4p4dqw0000mpdk8t1zrx0q_unknown_1777486768143-896608433.webm ---
+[2026-04-29 23:19:28,682] - INFO - prepview_engine_logger - Starting Head Movement Analysis...
+[2026-04-29 23:19:35,613] - INFO - prepview_engine_logger - Starting Eye Gaze Analysis (Single Pass Strategy)...
+[2026-04-29 23:19:42,465] - INFO - prepview_engine_logger - Starting Expression & Nervousness Analysis...
+[2026-04-29 23:19:46,741] - INFO - prepview_engine_logger - Expression Analysis Done. Dominant: neutral
+[2026-04-29 23:19:46,743] - INFO - prepview_engine_logger - --- Finished CV Analysis Component ---
+[2026-04-29 23:19:46,745] - INFO - prepview_engine_logger - Step 3: Running NLP Analysis...
+[2026-04-29 23:19:46,746] - INFO - prepview_engine_logger - Running NLP Analysis for: cmo4p4dqw0000mpdk8t1zrx0q_unknown_1777486768143-896608433_audio.wav...
+[2026-04-29 23:20:30,515] - INFO - prepview_engine_logger - NLP Analysis Complete. Score: 70.0/100
+[2026-04-29 23:20:30,516] - INFO - prepview_engine_logger - Step 4: Saving Results to Database...
+[2026-04-29 23:20:36,971] - INFO - prepview_engine_logger -  Chunk saved: Session=session-1777486333968-xgaw8brt1 | Q=Q2
+[2026-04-29 23:20:37,216] - INFO - prepview_engine_logger - [SUCCESS] Chunk Q2 processed and stored successfully.
