@@ -285,39 +285,38 @@ router.get('/results/:sessionId', async (req, res) => {
 router.post('/run-code', verifyToken, async (req, res) => {
   try {
     const { code, language } = req.body;
-    if (!code || !language) return res.status(400).json({ message: 'Code/Lang required' });
+    
+    // JDoodle language codes
+    const JDOODLE_LANGS = {
+      javascript: 'nodejs',
+      python: 'python3',
+      cpp: 'cpp17',
+      java: 'java'
+    };
 
-    const tempDir = path.join(__dirname, '../temp');
-    if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
+    const targetLang = JDOODLE_LANGS[language];
+    if (!targetLang) return res.status(400).json({ message: 'Unsupported language' });
 
-    let command = '';
-    let tempFile = '';
-    const timestamp = Date.now();
+    const response = await fetch('https://api.jdoodle.com/v1/execute', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        clientId: process.env.JDOODLE_CLIENT_ID,
+        clientSecret: process.env.JDOODLE_CLIENT_SECRET,
+        script: code,
+        language: targetLang,
+        versionIndex: "0" 
+      })
+    });
 
-    switch (language) {
-      case 'javascript':
-        tempFile = path.join(tempDir, `code-${timestamp}.js`);
-        fs.writeFileSync(tempFile, code);
-        command = `node "${tempFile}"`;
-        break;
-      case 'python':
-        tempFile = path.join(tempDir, `code-${timestamp}.py`);
-        fs.writeFileSync(tempFile, code);
-        command = `python "${tempFile}"`;
-        break;
-      // ... Add other languages as needed
-      default:
-        return res.status(400).json({ message: 'Unsupported language' });
-    }
+    const data = await response.json();
+    
+    // JDoodle returns output directly
+    res.json({ 
+      output: data.output, 
+      error: data.error || null 
+    });
 
-    try {
-      const { stdout, stderr } = await execPromise(command, { timeout: 10000 });
-      if (fs.existsSync(tempFile)) fs.unlinkSync(tempFile);
-      res.json({ output: stdout || stderr, result: stdout, error: stderr || null });
-    } catch (execError) {
-      if (fs.existsSync(tempFile)) fs.unlinkSync(tempFile);
-      res.json({ output: execError.stderr || execError.message, error: execError.message });
-    }
   } catch (error) {
     res.status(500).json({ message: 'Execution error', error: error.message });
   }

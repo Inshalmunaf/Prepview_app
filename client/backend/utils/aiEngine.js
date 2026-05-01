@@ -4,57 +4,88 @@ require("dotenv").config(); // Ensure env vars are loaded
 // Groq connection setup
 // API Key automatically picked from process.env.GROQ_API_KEY
 const groq = new Groq({
-    apiKey: process.env.GROQ_API_KEY 
+  apiKey: process.env.GROQ_API_KEY
 });
 
 class AIInterviewEngine {
-  
+
   async generateQuestions(cvData, field) {
     // Model: 'llama3-8b-8192' is super fast (Best for Demo)
     const MODEL_NAME = "llama-3.3-70b-versatile";
-    
-    console.log(`🚀 AI Engine (Groq): Generating VERBAL questions for '${field}' using ${MODEL_NAME}...`);
+
+    console.log(`🚀 AI Engine (Groq): Generating HYBRID (Verbal + High-Signal Coding) questions for '${field}' using ${MODEL_NAME}...`);
 
     const systemPrompt = `
-      You are a senior technical interviewer conducting a VIDEO interview.
+      You are a senior technical interviewer conducting a comprehensive hybrid VIDEO and CODING interview.
       Analyze the candidate's Resume and Target Field.
-      Generate exactly 5 technical interview questions.
-
+      Generate EXACTLY 5 technical interview questions.
+    
       STRICT RULES (CRITICAL):
-      1. NO CODING TASKS: Do NOT ask the candidate to "write code", "implement a function", or "type a program".
-      2. VERBAL ANSWERS ONLY: Ask questions that test logic, concepts, architecture, and problem-solving skills verbally.
-         - Instead of "Write a function to reverse a string", ask "How would you logically reverse a string in memory?".
-         - Instead of "Implement a database schema", ask "How would you design the database relations for this app?".
-      3. Resume-Based: If projects exist, ask about design decisions, challenges, and "why" they chose specific tools.
-      4. Field-Based: If the resume is weak, ask conceptual questions about ${field}.
-
+      1. QUESTION DISTRIBUTION: 
+         - Questions 1, 2, and 3 MUST be Verbal/Conceptual questions.
+         - Questions 4 and 5 MUST be Technical Coding tasks.
+         
+      2. VERBAL QUESTIONS (Q1-3): 
+         - Test logic, system architecture, and conceptual knowledge. 
+         - NEVER ask the candidate to write code for these.
+         
+      3. CODING QUESTIONS (Q4-5) - SHORT BUT HIGH-SIGNAL (10-15 LINES MAX): 
+         - The problem MUST be solvable in 1 to 2 minutes with a maximum of 10 to 15 lines of code.
+         - IT MUST NOT BE TRIVIAL. The problem MUST allow the AI to evaluate:
+           * Efficiency / Big-O (e.g., using a Hash Map/Set for O(1) lookups vs O(N) nested loops).
+           * Best Practices (e.g., handling edge cases, clean variable naming).
+           * Problem Solving Logic.
+         - Good examples: "Find the first non-repeating character", "Array Intersection", or "Two Sum".
+         - Bad examples (Too simple): "Filter even numbers", "Reverse a string using built-in methods".
+         - Bad examples (Too long): "Dynamic Programming", "Tree Traversals", "Dijkstra's Algorithm".
+    
       REQUIRED JSON OUTPUT FORMAT:
       Return a raw JSON object with a "questions" array. Each object MUST have:
       - "id": Integer (1 to 5)
-      - "question": Short title (e.g., "React Virtual DOM")
-      - "description": A 1-sentence question asking for a verbal explanation (e.g., "Explain how the Virtual DOM improves performance compared to direct DOM manipulation.")
+      - "type": String (Must be exactly "verbal" OR "coding")
+      - "question": Short title
+      - "description": The detailed problem statement including expected input/output and constraints.
     `;
 
-    // Resume Data ko String mein convert
     const userPrompt = `
       CANDIDATE DATA:
       ${JSON.stringify(cvData)}
-
+    
       TARGET FIELD:
       ${field}
-
-      STRICT OUTPUT EXAMPLE (VERBAL ONLY):
+    
+      STRICT OUTPUT EXAMPLE:
       {
         "questions": [
           {
             "id": 1,
+            "type": "verbal",
             "question": "API Security",
-            "description": "Verbally explain how you would secure a REST API against common attacks like SQL Injection."
+            "description": "Verbally explain how you would secure a REST API against common attacks like SQL Injection and XSS."
           },
           {
             "id": 2,
+            "type": "verbal",
             "question": "State Management Logic",
-            "description": "Describe the difference between Redux and Context API, and when you would choose one over the other."
+            "description": "Describe the difference between Redux and Context API based on your previous projects."
+          },
+          {
+            "id": 3,
+            "type": "verbal",
+            "question": "Database Optimization",
+            "description": "Explain how database indexing works under the hood and when you should avoid using it."
+          },
+          {
+            "id": 4,
+            "type": "coding",
+            "question": "First Unique Character",
+            "description": "Write a function that takes a string and returns the index of the first non-repeating character. If it doesn't exist, return -1. Optimize your solution for time complexity."
+          },
+          {
+            "id": 5,
+            "type": "coding",
+            "question": "Array Intersection",
+            "description": "Given two integer arrays, return an array of their intersection. Each element in the result must be unique. Consider using a Set for optimal O(N) efficiency."
           }
         ]
       }
@@ -70,47 +101,47 @@ class AIInterviewEngine {
         model: MODEL_NAME,
         temperature: 0.6,
         // ✨ Critical: Ye ensure karta hai ke Groq valid JSON hi return kare
-        response_format: { type: "json_object" } 
+        response_format: { type: "json_object" }
       });
 
       // Groq response structure
       const responseContent = completion.choices[0]?.message?.content;
-      
+
       // JSON Parse karein
       const content = JSON.parse(responseContent || "{}");
-      
+
       console.log("✅ Questions Generated by Groq (Fast!)");
-      return content.questions; 
+      return content.questions;
 
     } catch (error) {
       console.error(" Groq Generation Failed:", error);
-      
+
       // Fallback: Agar Internet issue ho ya API limit cross ho jaye
       return [
-        { 
-          id: 1, 
-          question: "Introduction", 
-          description: "Please introduce yourself and highlight your key technical skills." 
+        {
+          id: 1,
+          question: "Introduction",
+          description: "Please introduce yourself and highlight your key technical skills."
         },
-        { 
-          id: 2, 
-          question: "Project Challenge", 
-          description: "Describe the most difficult bug you faced in a recent project and how you solved it." 
+        {
+          id: 2,
+          question: "Project Challenge",
+          description: "Describe the most difficult bug you faced in a recent project and how you solved it."
         },
-        { 
-          id: 3, 
-          question: `Core Concepts of ${field}`, 
-          description: `Can you explain a complex concept in ${field} in simple terms?` 
+        {
+          id: 3,
+          question: `Core Concepts of ${field}`,
+          description: `Can you explain a complex concept in ${field} in simple terms?`
         },
-        { 
-          id: 4, 
-          question: "System Design", 
-          description: "How would you approach designing a scalable architecture for a high-traffic application?" 
+        {
+          id: 4,
+          question: "System Design",
+          description: "How would you approach designing a scalable architecture for a high-traffic application?"
         },
-        { 
-          id: 5, 
-          question: "Learning Adaptability", 
-          description: "Tell me about a time you had to learn a new technology quickly to meet a deadline." 
+        {
+          id: 5,
+          question: "Learning Adaptability",
+          description: "Tell me about a time you had to learn a new technology quickly to meet a deadline."
         }
       ];
     }

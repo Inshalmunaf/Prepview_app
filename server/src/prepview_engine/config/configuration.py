@@ -354,7 +354,7 @@ class ConfigurationManager:
 
         return config
 
-  
+    
 
     def get_confidence_training_config(self) -> ConfidenceTrainingConfig:
         config = self.config.confidence_model_training
