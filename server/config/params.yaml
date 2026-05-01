@@ -133,6 +133,19 @@ cv_analysis:
     default_brow_squeeze: 0.33
     default_brow_drop: 0.35
 
+code_analysis:
+  provider: "groq"
+  model_name: "llama-3.3-70b-versatile"
+  base_url: "https://api.groq.com/openai/v1/chat/completions"
+  max_tokens: 1024
+  temperature: 0.2
+  weights:
+    correctness: 0.30
+    code_quality: 0.25
+    problem_solving: 0.20
+    efficiency: 0.15
+    best_practices: 0.10
+
 # Report Generation Component
 
 report_generation:

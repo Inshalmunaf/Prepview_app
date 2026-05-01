@@ -16,8 +16,7 @@ const languages = [
   { value: 'python', label: 'Python' },
   { value: 'cpp', label: 'C++' },
   { value: 'java', label: 'Java' },
-  { value: 'typescript', label: 'TypeScript' },
-  { value: 'csharp', label: 'C#' },
+  
 ]
 
 export default function InterviewInterface({ fieldId }: InterviewInterfaceProps) {

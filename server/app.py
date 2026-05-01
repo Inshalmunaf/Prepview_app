@@ -59,6 +59,14 @@ class AnalyzeRequest(BaseModel):
     question_id: str
     video_file_path: str
 
+class CodeAnalyzeRequest(BaseModel):
+    session_id: str
+    question_id: int
+    code: str
+    language: str
+    question_title: str
+    question_description: str
+
 class ReportRequest(BaseModel):
     session_id: str
     user_id: str
@@ -73,6 +81,22 @@ def process_video_task(request: AnalyzeRequest):
             analysis_pipeline.process_chunk(request.session_id, request.question_id, request.video_file_path)
     except Exception as e:
         logger.error(f"❌ Pipeline Error: {e}", exc_info=True)
+
+def process_code_task(request: CodeAnalyzeRequest):
+    try:
+        if analysis_pipeline:
+            analysis_pipeline.process_code_chunk(
+                session_id=request.session_id,
+                question_id=request.question_id,
+                code=request.code,
+                language=request.language,
+                question_title=request.question_title,
+                question_description=request.question_description,
+                video_path_str=getattr(request, 'video_file_path', ""), # Safely handles video path
+                field=getattr(request, 'field', "Software Engineering") # Safely handles field
+            )
+    except Exception as e:
+        logger.error(f" Code Pipeline Error: {e}", exc_info=True)
 
 # --- Task B: Generate Report 
 def generate_report_task(request: ReportRequest):
@@ -141,6 +165,22 @@ async def analyze_chunk(request: AnalyzeRequest, background_tasks: BackgroundTas
     return {
         "status": "processing_started",
         "message": "Request received. Pipeline is processing in background.",
+        "session_id": request.session_id
+    }
+
+@app.post("/analyze_code")
+async def analyze_code(request: CodeAnalyzeRequest, background_tasks: BackgroundTasks):
+    
+    # Input Check
+    if not request.session_id or not request.question_id:
+        raise HTTPException(status_code=400, detail="Missing IDs")
+
+    # Background Task Add
+    background_tasks.add_task(process_code_task, request)
+
+    return {
+        "status": "processing_started",
+        "message": "Code received. AI Analysis is running in background.",
         "session_id": request.session_id
     }
 

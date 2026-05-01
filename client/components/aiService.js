@@ -25,6 +25,31 @@ export const aiService = {
     }
   },
 
+  analyzeCode: async (sessionId, questionId, code, language, questionTitle, questionDescription, videoPath = "") => {
+    try {
+      console.log(`💻 Calling AI Code Analysis for Question: ${questionId}`);
+      
+      // Payload ko Python API ke CodeAnalyzeRequest model ke mutabiq map kiya hai
+      const payload = {
+        session_id: sessionId,
+        question_id: questionId,
+        code: code,
+        language: language,
+        question_title: questionTitle,
+        question_description: questionDescription,
+        video_file_path: videoPath // Optional, agar nahi hai toh empty string jayegi
+      };
+
+      const response = await axios.post(`${AI_API_URL}/analyze_code`, payload);
+      console.log("💻 Code Analysis Started:", response.data);
+      return response.data;
+      
+    } catch (error) {
+      console.error("💻 Code Analysis Failed:", error);
+      throw error;
+    }
+  },
+
   // 2. Generate Final Report (Jab interview khatam ho)
   generateFinalReport: async (sessionId, userId) => {
     try {

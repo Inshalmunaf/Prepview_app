@@ -141,6 +141,14 @@ class CVConfig(BaseModel):
     expr_default_lip_thickness: float
     expr_default_brow_squeeze: float
     expr_default_brow_drop: float
+    
+class CodeAnalysisConfig(BaseModel):
+    provider: str
+    model_name: str
+    base_url: str
+    max_tokens: int
+    temperature: float
+    weights: Dict[str, float]
 
 class ReportGenerationConfig(BaseModel):
     provider: str
@@ -150,6 +158,7 @@ class ReportGenerationConfig(BaseModel):
     max_tokens: int
     system_prompt: str
     user_prompt_template: str
+
 
 # --- Step 2: The Main Configuration Manager Class ---
 
@@ -332,7 +341,26 @@ class ConfigurationManager:
             # Assuming 'logger' is imported in this file
             logger.error(f"Error parsing CV params: {e}")
             raise e
-
+        
+    def get_code_analysis_config(self) -> CodeAnalysisConfig:
+        """Returns Code Analysis AI parameters and weights from params.yaml"""
+        try:
+            # Assuming your params.yaml has a top-level key 'code_analysis'
+            code_params = self.params.code_analysis
+            
+            return CodeAnalysisConfig(
+                provider=code_params.provider,
+                model_name=code_params.model_name,
+                base_url=code_params.base_url,
+                max_tokens=code_params.max_tokens,
+                temperature=code_params.temperature,
+                weights=code_params.weights  
+            )
+        except Exception as e:
+            # Assuming 'logger' is imported
+            logger.error(f"Error parsing Code Analysis params: {e}")
+            raise e
+        
     def get_report_generation_config(self) -> ReportGenerationConfig:
         
         # params.yaml se 'report_generation' section uthaya

@@ -84,3 +84,61 @@ class AnalysisPipeline:
             import traceback
             traceback.print_exc()
             return False
+    
+    def process_code_chunk(self, session_id: str, question_id: str, code: str, language: str, question_title: str, question_description: str, video_path_str: str):
+        """
+        Processes a SINGLE coding question chunk.
+        Flow: Code string -> LLaMA-3 Code Evaluation -> Database Storage
+        """
+        logger.info(f"[START] Processing Code Chunk: {question_id} for Session: {session_id}")
+        
+        # Note: video_path_str is available here if you decide to add Video/CV analysis to coding questions later.
+        if video_path_str:
+            logger.debug(f"Video path received but skipping video analysis for coding chunk: {video_path_str}")
+
+        if not code or code.strip() == "":
+            logger.error(f"Empty code received for question {question_id}")
+            return False
+
+        try:
+            # Combine title and description for the AI Prompt
+            full_question_context = f"Title: {question_title}\nDescription: {question_description}"
+
+            # --- STEP 1: AI CODE ANALYSIS ---
+            logger.info("Step 1: Running Code Analysis via AI...")
+            
+            # 🌟 UPDATE: Using the new .run() standard interface
+            code_results = self.code_analyzer.run(
+                question=full_question_context,
+                code=code,
+                language=language,
+                video_path_str=video_path_str,
+            )
+
+            if not code_results.get("success"):
+                logger.error(f"Code Evaluation Failed: {code_results.get('error_message')}")
+                # Agar API crash hui hai, toh hum DB mein save nahi karenge
+                return False
+
+            # --- STEP 2: STORAGE (Save to DB) ---
+            logger.info("Step 2: Saving Code Evaluation Results to Database...")
+            
+            # Note: Aapko apni db_connector file mein 'save_code_results' ka function banana hoga
+            save_success = self.db.save_code_results(
+                session_id=session_id,
+                question_id=question_id,
+                code_data=code_results
+            )
+
+            if save_success:
+                logger.info(f"[SUCCESS] Code Chunk {question_id} processed and stored successfully.")
+                return True
+            else:
+                logger.error(f"[FAILURE] Analysis done but Database Save failed for {question_id}.")
+                return False
+
+        except Exception as e:
+            logger.error(f"Code Pipeline Crashed for {question_id}: {e}")
+            import traceback
+            traceback.print_exc()
+            return False
