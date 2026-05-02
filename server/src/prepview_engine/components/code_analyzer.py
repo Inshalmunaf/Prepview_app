@@ -20,7 +20,7 @@ class CodeAnalyzer:
         try:
             # 1. Initialize central config manager (jo params.yaml read karega)
             self.config = config
-            
+            self.weights = self.config.weights
             logger.info(f"🚀 Code Analyzer Initialized (Provider: {self.config.provider}, Model: {self.config.model_name})")
             logger.debug(f"⚖️ Using Grading Weights: {self.weights}")
             
@@ -56,7 +56,17 @@ class CodeAnalyzer:
             5. best_practices (0-10): Are edge cases, errors, and null values handled properly?
 
             REQUIRED JSON OUTPUT FORMAT:
-            Return a raw JSON object with a "scores" object and a "feedback" string.
+            Return a raw JSON object with ONLY a "scores" object. Do NOT include any feedback strings.
+            Example:
+            {{
+                "scores": {{
+                    "correctness": 8,
+                    "code_quality": 7,
+                    "problem_solving": 9,
+                    "efficiency": 8,
+                    "best_practices": 7
+                }}
+            }}
             """
 
             user_prompt = f"""
@@ -154,11 +164,11 @@ class CodeAnalyzer:
 
             final_score = round(final_score)
 
+            # 🌟 UPDATE: Removed overall_feedback, returning ONLY what you requested
             return {
                 "success": True,
                 "final_score": final_score,
-                "category_scores": raw_scores,
-                "overall_feedback": llm_response.get("feedback", "Good attempt.")
+                "category_scores": raw_scores
             }
 
         except json.JSONDecodeError as e:

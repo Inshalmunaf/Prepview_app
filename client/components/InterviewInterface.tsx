@@ -163,29 +163,38 @@ export default function InterviewInterface({ fieldId }: InterviewInterfaceProps)
     setIsRecording(false)
     setIsUploading(true) 
 
-    // ⚡ CHANGE 4: Promise-based Stop (Wait for REAL stop event)
-    // Ye ensure karega ke saara data aa chuka hai
+    // Wait for REAL stop event
     await new Promise<void>((resolve) => {
         recorder.onstop = () => resolve();
         recorder.stop();
     });
 
-    // Thora sa extra buffer safety ke liye
-    // (Optional but good for slow computers)
+    // Buffer safety
     await new Promise(r => setTimeout(r, 500));
 
-    // ⚡ CHANGE 5: Ref se Blob banayen
+    // Blob creation
     const blob = new Blob(mediaChunksRef.current, { type: 'video/webm' })
     
-    console.log(`📹 Video Size: ${blob.size} bytes`); // Debugging ke liye
+    console.log(`📹 Video Size: ${blob.size} bytes`);
 
     if (blob.size > 0) {
       const formData = new FormData()
       formData.append('video', blob, `question-${currentQuestion}.webm`)
-      
       formData.append('questionId', `Q${currentQuestion}`) 
       formData.append('fieldId', fieldId)
       formData.append('sessionId', sessionId)
+      
+      // 🌟 NEW LOGIC: Backend ko question ka type aur details batayen
+      const qType = currentQuestionData?.type || 'verbal';
+      formData.append('questionType', qType);
+      
+      if (qType === 'coding') {
+          // Agar coding question hai toh code editor ka data bhi sath bhejein
+          formData.append('code', code); // Editor ka state variable
+          formData.append('language', selectedLanguage); // Dropdown state
+          formData.append('questionTitle', currentQuestionData.question);
+          formData.append('questionDescription', currentQuestionData.description);
+      }
 
       const token = localStorage.getItem('token')
       try {
@@ -202,7 +211,7 @@ export default function InterviewInterface({ fieldId }: InterviewInterfaceProps)
           console.error('Upload failed:', errorData)
           alert('Upload failed. Please try again.')
         } else {
-            console.log(" Video uploaded & Analysis started")
+            console.log(`✅ Video uploaded & ${qType === 'coding' ? 'Code' : 'Verbal'} Analysis started`)
         }
       } catch (error) {
         console.error('Error uploading video:', error)

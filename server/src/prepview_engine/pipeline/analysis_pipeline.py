@@ -7,6 +7,7 @@ from prepview_engine.database.db_connector import DatabaseConnector
 from prepview_engine.components.preprocessing import PreprocessingComponent
 from prepview_engine.components.cv_analyzer import CVAnalyzerComponent
 from prepview_engine.components.nlp_analyzer import NLPAnalyzerComponent
+from prepview_engine.components.code_analyzer import CodeAnalyzer
 
 class AnalysisPipeline:
     def __init__(self):
@@ -30,6 +31,9 @@ class AnalysisPipeline:
         
         logger.info("Loading NLP Model Configuration...")
         self.nlp_analyzer = NLPAnalyzerComponent(config=self.config_manager.get_nlp_config())
+
+        logger.info("Loading Code Configuration...")
+        self.code_analyzer = CodeAnalyzer(config=self.config_manager.get_code_analysis_config())
         
         logger.info("Pipeline Components Ready.")
 

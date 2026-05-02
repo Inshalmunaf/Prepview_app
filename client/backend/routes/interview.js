@@ -144,54 +144,72 @@ router.post('/session', verifyToken, async (req, res) => {
 });
 
 // ==========================================
-// 2. UPLOAD VIDEO & TRIGGER PYTHON AI
+// UPLOAD VIDEO & DYNAMICALLY TRIGGER PYTHON AI
 // ==========================================
 router.post('/upload', verifyToken, upload.single('video'), async (req, res) => {
   try {
-    // 1. Validation
     if (!req.file) {
       return res.status(400).json({ message: 'No video file uploaded' });
     }
 
-    const { questionId, sessionId } = req.body;
+    // Frontend se bheja gaya saara data yahan receive hoga
+    const { 
+        questionId, 
+        sessionId, 
+        questionType, 
+        code, 
+        language, 
+        questionTitle, 
+        questionDescription 
+    } = req.body;
+
     if (!sessionId) {
       return res.status(400).json({ message: 'Session ID is required' });
     }
 
-    // 2. File Path Sahi Karna (Critical Step for Windows) 
-    // Windows par path 'C:\User\...' ata hai jo JSON mein error deta hai.
-    // Hum isay Forward Slashes '/' mein convert kar denge.
+    // Fix Windows path issues
     let videoAbsolutePath = path.resolve(req.file.path);
     videoAbsolutePath = videoAbsolutePath.replace(/\\/g, '/'); 
 
-    console.log(`[Node]  Video Saved at: ${videoAbsolutePath}`);
-    console.log(`[Node]  Handshaking with Python AI for Q: ${questionId}`);
+    console.log(`[Node] 📹 Video Saved at: ${videoAbsolutePath}`);
 
-    // 3. PYTHON API CALL (Fire & Forget) 
-    // Hum 'await' nahi lagayenge taakay User ko wait na karna pare.
-    axios.post('http://localhost:8000/analyze_chunk', {
-      session_id: sessionId,
-      question_id: questionId,
-      video_file_path: videoAbsolutePath
-    })
-    .then(pyRes => {
-      console.log(`[Python Success]  Status: ${pyRes.data.status}`);
-    })
-    .catch(err => {
-      // Agar Python band hai, toh Node crash nahi hona chahiye
-      console.error(`[Python Failed]  Error: ${err.message}`);
-      if (err.code === 'ECONNREFUSED') {
-        console.error(" Tip: Check if 'python app.py' is running on port 8000");
-      }
-    });
+    // 🌟 SMART ROUTING: Check question type to hit the right Python API
+    if (questionType === 'coding') {
+        
+        console.log(`[Node] 💻 Handshaking with Python CODE Analyzer for Q: ${questionId}`);
+        
+        axios.post('http://localhost:8000/analyze_code', {
+            session_id: sessionId,
+            question_id: questionId,
+            code: code,
+            language: language,
+            question_title: questionTitle,
+            question_description: questionDescription,
+            video_file_path: videoAbsolutePath // Path bhej rahe hain in case aapko coding mein bhi visual tracking chahiye ho
+        })
+        .then(pyRes => console.log(`[Python Code Success] Status: ${pyRes.data.status}`))
+        .catch(err => console.error(`[Python Code Failed] Error: ${err.message}`));
 
-    // 4. Response to Frontend (React)
-    // Frontend ko bas ye bata do ke upload ho gaya, baqi kaam peeche ho raha hai
+    } else {
+        
+        console.log(`[Node] 🗣️ Handshaking with Python VERBAL Analyzer for Q: ${questionId}`);
+        
+        axios.post('http://localhost:8000/analyze_chunk', {
+            session_id: sessionId,
+            question_id: questionId,
+            video_file_path: videoAbsolutePath
+        })
+        .then(pyRes => console.log(`[Python Verbal Success] Status: ${pyRes.data.status}`))
+        .catch(err => console.error(`[Python Verbal Failed] Error: ${err.message}`));
+    }
+
+    // Response back to React immediately (Don't wait for Python)
     res.json({
-      message: 'Video uploaded successfully. AI analysis started in background.',
+      message: `Video uploaded successfully. ${questionType === 'coding' ? 'Code' : 'Verbal'} analysis started in background.`,
       sessionId: sessionId,
       filename: req.file.filename,
-      pythonTriggered: true
+      pythonTriggered: true,
+      analysisType: questionType
     });
 
   } catch (error) {
@@ -199,7 +217,6 @@ router.post('/upload', verifyToken, upload.single('video'), async (req, res) => 
     res.status(500).json({ message: 'Error uploading video', error: error.message });
   }
 });
-
 
 
 

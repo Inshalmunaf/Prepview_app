@@ -3,6 +3,7 @@ from prepview_engine.constants import CONFIG_FILE_PATH, PARAMS_FILE_PATH
 from pydantic import BaseModel, DirectoryPath, FilePath
 from pathlib import Path
 import os
+from typing import Dict
 from dotenv import load_dotenv
 # --- Step 1: Define data structures using Pydantic ---
 # Ye models hamain config.yaml ki structure ko validate karnay mai madad dengay

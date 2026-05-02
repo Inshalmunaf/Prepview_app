@@ -61,7 +61,7 @@ class AnalyzeRequest(BaseModel):
 
 class CodeAnalyzeRequest(BaseModel):
     session_id: str
-    question_id: int
+    question_id: str
     code: str
     language: str
     question_title: str
@@ -93,7 +93,6 @@ def process_code_task(request: CodeAnalyzeRequest):
                 question_title=request.question_title,
                 question_description=request.question_description,
                 video_path_str=getattr(request, 'video_file_path', ""), # Safely handles video path
-                field=getattr(request, 'field', "Software Engineering") # Safely handles field
             )
     except Exception as e:
         logger.error(f" Code Pipeline Error: {e}", exc_info=True)
