@@ -25,3 +25,4 @@ pandas
 openai-whisper
 sentence-transformers
 psycopg2-binary 
+ultralytics
