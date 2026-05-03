@@ -1134,3 +1134,638 @@ AttributeError: 'CodeAnalyzeRequest' object has no attribute 'video_file_path'
 [2026-05-03 03:51:18,118] - INFO - prepview_engine_logger - --- Finished Full Interview Analysis Component ---
 [2026-05-03 03:51:18,118] - INFO - prepview_engine_logger - Step 2: Saving Code Evaluation Results to Database...
 [2026-05-03 03:51:18,120] - ERROR - prepview_engine_logger - Code Pipeline Crashed for Q5: 'DatabaseConnector' object has no attribute 'save_code_results'
+[2026-05-03 05:25:42,368] - INFO - prepview_engine_logger -  Starting PrepView AI Engine...
+[2026-05-03 05:25:42,409] - INFO - prepview_engine_logger - YAML file 'config\config.yaml' loaded successfully.
+[2026-05-03 05:25:42,483] - INFO - prepview_engine_logger - YAML file 'config\params.yaml' loaded successfully.
+[2026-05-03 05:25:42,489] - INFO - prepview_engine_logger - Configuration files loaded and artifacts root directory ensured.
+[2026-05-03 05:25:42,981] - INFO - prepview_engine_logger -  [DB] Connected to PostgreSQL via Config Manager
+[2026-05-03 05:25:43,651] - INFO - prepview_engine_logger - Initializing Analysis Pipeline Components...
+[2026-05-03 05:25:43,658] - INFO - prepview_engine_logger - YAML file 'config\config.yaml' loaded successfully.
+[2026-05-03 05:25:43,712] - INFO - prepview_engine_logger - YAML file 'config\params.yaml' loaded successfully.
+[2026-05-03 05:25:43,713] - INFO - prepview_engine_logger - Configuration files loaded and artifacts root directory ensured.
+[2026-05-03 05:25:43,715] - INFO - prepview_engine_logger -  [DB] Connected to PostgreSQL via Config Manager
+[2026-05-03 05:25:43,717] - INFO - prepview_engine_logger - PreprocessingComponent Initialized.
+[2026-05-03 05:25:43,717] - INFO - prepview_engine_logger - Loading CV Model Configuration...
+[2026-05-03 05:25:43,720] - INFO - prepview_engine_logger - CVAnalyzerComponent Initialized.
+[2026-05-03 05:25:43,721] - INFO - prepview_engine_logger - Loading NLP Model Configuration...
+[2026-05-03 05:25:49,158] - INFO - sentence_transformers.SentenceTransformer - Use pytorch device_name: cpu
+[2026-05-03 05:25:49,158] - INFO - sentence_transformers.SentenceTransformer - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+[2026-05-03 05:25:54,322] - INFO - prepview_engine_logger - NLPAnalyzerComponent Initialized.
+[2026-05-03 05:25:54,322] - INFO - prepview_engine_logger - Loading Code Configuration...
+[2026-05-03 05:25:54,369] - INFO - prepview_engine_logger - Pipeline Components Ready.
+[2026-05-03 05:25:54,434] - INFO - prepview_engine_logger - Result Aggregator Initialized (with DB connection).
+[2026-05-03 05:25:54,434] - INFO - prepview_engine_logger -  Report Generator Initialized (Provider: groq, Model: llama-3.3-70b-versatile)
+[2026-05-03 05:25:54,434] - INFO - prepview_engine_logger -  All Systems Ready!
+[2026-05-03 05:28:24,565] - INFO - prepview_engine_logger - [START] Processing Chunk: Q1 for Session: session-1777768056533-pjqrdngea
+[2026-05-03 05:28:24,565] - INFO - prepview_engine_logger - Step 1: Extracting Audio...
+[2026-05-03 05:28:24,568] - INFO - prepview_engine_logger - --- Processing Video: cmop144l10000wcwrbqpxc85q_unknown_1777768104176-551793423.webm ---
+[2026-05-03 05:28:24,570] - INFO - prepview_engine_logger - Starting audio extraction for: cmop144l10000wcwrbqpxc85q_unknown_1777768104176-551793423.webm
+[2026-05-03 05:28:25,185] - INFO - prepview_engine_logger - Audio saved to: artifacts\temp_uploads\cmop144l10000wcwrbqpxc85q_unknown_1777768104176-551793423_audio.wav
+[2026-05-03 05:28:25,186] - INFO - prepview_engine_logger - Step 2: Running CV Analysis...
+[2026-05-03 05:28:25,188] - INFO - prepview_engine_logger - --- Starting CV Analysis for: cmop144l10000wcwrbqpxc85q_unknown_1777768104176-551793423.webm ---
+[2026-05-03 05:28:25,191] - INFO - prepview_engine_logger - Starting Head Movement Analysis...
+[2026-05-03 05:28:35,115] - INFO - prepview_engine_logger - Starting Eye Gaze Analysis (Single Pass Strategy)...
+[2026-05-03 05:28:45,749] - INFO - prepview_engine_logger - Starting Expression & Nervousness Analysis...
+[2026-05-03 05:28:50,903] - INFO - prepview_engine_logger - Expression Analysis Done. Dominant: neutral
+[2026-05-03 05:28:50,905] - INFO - prepview_engine_logger - --- Finished CV Analysis Component ---
+[2026-05-03 05:28:50,905] - INFO - prepview_engine_logger - Step 3: Running NLP Analysis...
+[2026-05-03 05:28:50,908] - INFO - prepview_engine_logger - Running NLP Analysis for: cmop144l10000wcwrbqpxc85q_unknown_1777768104176-551793423_audio.wav...
+[2026-05-03 05:30:00,785] - INFO - prepview_engine_logger - NLP Analysis Complete. Score: 75.0/100
+[2026-05-03 05:30:00,788] - INFO - prepview_engine_logger - Step 4: Saving Results to Database...
+[2026-05-03 05:30:04,846] - ERROR - prepview_engine_logger -  Failed to save chunk: 'original_technical_score' is an invalid keyword argument for InterviewChunk
+Traceback (most recent call last):
+  File "C:\Users\Inshal Munaf\Desktop\prepview_app\server\src\prepview_engine\database\db_connector.py", line 59, in save_chunk_results
+    new_chunk = InterviewChunk(
+                ^^^^^^^^^^^^^^^
+  File "<string>", line 4, in __init__
+  File "C:\Users\Inshal Munaf\Desktop\prepview_app\server\prepview_app\Lib\site-packages\sqlalchemy\orm\state.py", line 596, in _initialize_instance
+    with util.safe_reraise():
+  File "C:\Users\Inshal Munaf\Desktop\prepview_app\server\prepview_app\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "C:\Users\Inshal Munaf\Desktop\prepview_app\server\prepview_app\Lib\site-packages\sqlalchemy\orm\state.py", line 594, in _initialize_instance
+    manager.original_init(*mixed[1:], **kwargs)
+  File "C:\Users\Inshal Munaf\Desktop\prepview_app\server\prepview_app\Lib\site-packages\sqlalchemy\orm\decl_base.py", line 2179, in _declarative_constructor
+    raise TypeError(
+TypeError: 'original_technical_score' is an invalid keyword argument for InterviewChunk
+[2026-05-03 05:30:05,113] - ERROR - prepview_engine_logger - [FAILURE] Analysis done but Database Save failed for Q1.
+[2026-05-03 05:34:06,465] - INFO - prepview_engine_logger -  Starting PrepView AI Engine...
+[2026-05-03 05:34:06,476] - INFO - prepview_engine_logger - YAML file 'config\config.yaml' loaded successfully.
+[2026-05-03 05:34:06,519] - INFO - prepview_engine_logger - YAML file 'config\params.yaml' loaded successfully.
+[2026-05-03 05:34:06,524] - INFO - prepview_engine_logger - Configuration files loaded and artifacts root directory ensured.
+[2026-05-03 05:34:06,581] - INFO - prepview_engine_logger -  [DB] Connected to PostgreSQL via Config Manager
+[2026-05-03 05:34:06,628] - INFO - prepview_engine_logger - Initializing Analysis Pipeline Components...
+[2026-05-03 05:34:06,638] - INFO - prepview_engine_logger - YAML file 'config\config.yaml' loaded successfully.
+[2026-05-03 05:34:06,678] - INFO - prepview_engine_logger - YAML file 'config\params.yaml' loaded successfully.
+[2026-05-03 05:34:06,681] - INFO - prepview_engine_logger - Configuration files loaded and artifacts root directory ensured.
+[2026-05-03 05:34:06,683] - INFO - prepview_engine_logger -  [DB] Connected to PostgreSQL via Config Manager
+[2026-05-03 05:34:06,686] - INFO - prepview_engine_logger - PreprocessingComponent Initialized.
+[2026-05-03 05:34:06,688] - INFO - prepview_engine_logger - Loading CV Model Configuration...
+[2026-05-03 05:34:06,688] - INFO - prepview_engine_logger - CVAnalyzerComponent Initialized.
+[2026-05-03 05:34:06,688] - INFO - prepview_engine_logger - Loading NLP Model Configuration...
+[2026-05-03 05:34:09,423] - INFO - sentence_transformers.SentenceTransformer - Use pytorch device_name: cpu
+[2026-05-03 05:34:09,423] - INFO - sentence_transformers.SentenceTransformer - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+[2026-05-03 05:34:14,056] - INFO - prepview_engine_logger - NLPAnalyzerComponent Initialized.
+[2026-05-03 05:34:14,058] - INFO - prepview_engine_logger - Loading Code Configuration...
+[2026-05-03 05:34:14,120] - INFO - prepview_engine_logger - Pipeline Components Ready.
+[2026-05-03 05:34:14,170] - INFO - prepview_engine_logger - Result Aggregator Initialized (with DB connection).
+[2026-05-03 05:34:14,173] - INFO - prepview_engine_logger -  Report Generator Initialized (Provider: groq, Model: llama-3.3-70b-versatile)
+[2026-05-03 05:34:14,175] - INFO - prepview_engine_logger -  All Systems Ready!
+[2026-05-03 05:35:01,459] - INFO - prepview_engine_logger - [START] Processing Chunk: Q2 for Session: session-1777768056533-pjqrdngea
+[2026-05-03 05:35:01,460] - INFO - prepview_engine_logger - Step 1: Extracting Audio...
+[2026-05-03 05:35:01,460] - INFO - prepview_engine_logger - --- Processing Video: cmop144l10000wcwrbqpxc85q_unknown_1777768501304-172000179.webm ---
+[2026-05-03 05:35:01,462] - INFO - prepview_engine_logger - Starting audio extraction for: cmop144l10000wcwrbqpxc85q_unknown_1777768501304-172000179.webm
+[2026-05-03 05:35:01,654] - INFO - prepview_engine_logger - Audio saved to: artifacts\temp_uploads\cmop144l10000wcwrbqpxc85q_unknown_1777768501304-172000179_audio.wav
+[2026-05-03 05:35:01,655] - INFO - prepview_engine_logger - Step 2: Running CV Analysis...
+[2026-05-03 05:35:01,656] - INFO - prepview_engine_logger - --- Starting CV Analysis for: cmop144l10000wcwrbqpxc85q_unknown_1777768501304-172000179.webm ---
+[2026-05-03 05:35:01,657] - INFO - prepview_engine_logger - Starting Head Movement Analysis...
+[2026-05-03 05:35:07,760] - INFO - prepview_engine_logger - Starting Eye Gaze Analysis (Single Pass Strategy)...
+[2026-05-03 05:35:15,329] - INFO - prepview_engine_logger - Starting Expression & Nervousness Analysis...
+[2026-05-03 05:35:19,446] - INFO - prepview_engine_logger - Expression Analysis Done. Dominant: neutral
+[2026-05-03 05:35:19,449] - INFO - prepview_engine_logger - --- Finished CV Analysis Component ---
+[2026-05-03 05:35:19,450] - INFO - prepview_engine_logger - Step 3: Running NLP Analysis...
+[2026-05-03 05:35:19,451] - INFO - prepview_engine_logger - Running NLP Analysis for: cmop144l10000wcwrbqpxc85q_unknown_1777768501304-172000179_audio.wav...
+[2026-05-03 05:36:08,980] - INFO - prepview_engine_logger - NLP Analysis Complete. Score: 77.0/100
+[2026-05-03 05:36:08,982] - INFO - prepview_engine_logger - Step 4: Saving Results to Database...
+[2026-05-03 05:36:13,084] - ERROR - prepview_engine_logger -  Failed to save chunk: 'original_technical_score' is an invalid keyword argument for InterviewChunk
+Traceback (most recent call last):
+  File "C:\Users\Inshal Munaf\Desktop\prepview_app\server\src\prepview_engine\database\db_connector.py", line 59, in save_chunk_results
+    new_chunk = InterviewChunk(
+                ^^^^^^^^^^^^^^^
+  File "<string>", line 4, in __init__
+  File "C:\Users\Inshal Munaf\Desktop\prepview_app\server\prepview_app\Lib\site-packages\sqlalchemy\orm\state.py", line 596, in _initialize_instance
+    with util.safe_reraise():
+  File "C:\Users\Inshal Munaf\Desktop\prepview_app\server\prepview_app\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "C:\Users\Inshal Munaf\Desktop\prepview_app\server\prepview_app\Lib\site-packages\sqlalchemy\orm\state.py", line 594, in _initialize_instance
+    manager.original_init(*mixed[1:], **kwargs)
+  File "C:\Users\Inshal Munaf\Desktop\prepview_app\server\prepview_app\Lib\site-packages\sqlalchemy\orm\decl_base.py", line 2179, in _declarative_constructor
+    raise TypeError(
+TypeError: 'original_technical_score' is an invalid keyword argument for InterviewChunk
+[2026-05-03 05:36:13,104] - ERROR - prepview_engine_logger - [FAILURE] Analysis done but Database Save failed for Q2.
+[2026-05-03 05:45:29,049] - INFO - prepview_engine_logger -  Starting PrepView AI Engine...
+[2026-05-03 05:45:29,061] - INFO - prepview_engine_logger - YAML file 'config\config.yaml' loaded successfully.
+[2026-05-03 05:45:29,126] - INFO - prepview_engine_logger - YAML file 'config\params.yaml' loaded successfully.
+[2026-05-03 05:45:29,128] - INFO - prepview_engine_logger - Configuration files loaded and artifacts root directory ensured.
+[2026-05-03 05:45:29,221] - INFO - prepview_engine_logger -  [DB] Connected to PostgreSQL via Config Manager
+[2026-05-03 05:45:29,309] - INFO - prepview_engine_logger - Initializing Analysis Pipeline Components...
+[2026-05-03 05:45:29,323] - INFO - prepview_engine_logger - YAML file 'config\config.yaml' loaded successfully.
+[2026-05-03 05:45:29,356] - INFO - prepview_engine_logger - YAML file 'config\params.yaml' loaded successfully.
+[2026-05-03 05:45:29,358] - INFO - prepview_engine_logger - Configuration files loaded and artifacts root directory ensured.
+[2026-05-03 05:45:29,358] - INFO - prepview_engine_logger -  [DB] Connected to PostgreSQL via Config Manager
+[2026-05-03 05:45:29,361] - INFO - prepview_engine_logger - PreprocessingComponent Initialized.
+[2026-05-03 05:45:29,362] - INFO - prepview_engine_logger - Loading CV Model Configuration...
+[2026-05-03 05:45:29,362] - INFO - prepview_engine_logger - CVAnalyzerComponent Initialized.
+[2026-05-03 05:45:29,363] - INFO - prepview_engine_logger - Loading NLP Model Configuration...
+[2026-05-03 05:45:32,406] - INFO - sentence_transformers.SentenceTransformer - Use pytorch device_name: cpu
+[2026-05-03 05:45:32,406] - INFO - sentence_transformers.SentenceTransformer - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+[2026-05-03 05:45:37,402] - INFO - prepview_engine_logger - NLPAnalyzerComponent Initialized.
+[2026-05-03 05:45:37,406] - INFO - prepview_engine_logger - Loading Code Configuration...
+[2026-05-03 05:45:37,484] - INFO - prepview_engine_logger - Pipeline Components Ready.
+[2026-05-03 05:45:37,541] - INFO - prepview_engine_logger - Result Aggregator Initialized (with DB connection).
+[2026-05-03 05:45:37,544] - INFO - prepview_engine_logger -  Report Generator Initialized (Provider: groq, Model: llama-3.3-70b-versatile)
+[2026-05-03 05:45:37,546] - INFO - prepview_engine_logger -  All Systems Ready!
+[2026-05-03 05:46:41,085] - INFO - prepview_engine_logger - [START] Processing Chunk: Q3 for Session: session-1777768056533-pjqrdngea
+[2026-05-03 05:46:41,086] - INFO - prepview_engine_logger - Step 1: Extracting Audio...
+[2026-05-03 05:46:41,088] - INFO - prepview_engine_logger - --- Processing Video: cmop144l10000wcwrbqpxc85q_unknown_1777769200861-925788319.webm ---
+[2026-05-03 05:46:41,091] - INFO - prepview_engine_logger - Starting audio extraction for: cmop144l10000wcwrbqpxc85q_unknown_1777769200861-925788319.webm
+[2026-05-03 05:46:41,373] - INFO - prepview_engine_logger - Audio saved to: artifacts\temp_uploads\cmop144l10000wcwrbqpxc85q_unknown_1777769200861-925788319_audio.wav
+[2026-05-03 05:46:41,375] - INFO - prepview_engine_logger - Step 2: Running CV Analysis...
+[2026-05-03 05:46:41,376] - INFO - prepview_engine_logger - --- Starting CV Analysis for: cmop144l10000wcwrbqpxc85q_unknown_1777769200861-925788319.webm ---
+[2026-05-03 05:46:41,376] - INFO - prepview_engine_logger - Starting Head Movement Analysis...
+[2026-05-03 05:46:48,350] - INFO - prepview_engine_logger - Starting Eye Gaze Analysis (Single Pass Strategy)...
+[2026-05-03 05:46:55,762] - INFO - prepview_engine_logger - Starting Expression & Nervousness Analysis...
+[2026-05-03 05:46:59,483] - INFO - prepview_engine_logger - Expression Analysis Done. Dominant: neutral
+[2026-05-03 05:46:59,485] - INFO - prepview_engine_logger - --- Finished CV Analysis Component ---
+[2026-05-03 05:46:59,487] - INFO - prepview_engine_logger - Step 3: Running NLP Analysis...
+[2026-05-03 05:46:59,488] - INFO - prepview_engine_logger - Running NLP Analysis for: cmop144l10000wcwrbqpxc85q_unknown_1777769200861-925788319_audio.wav...
+[2026-05-03 05:47:36,548] - INFO - prepview_engine_logger - NLP Analysis Complete. Score: 92.0/100
+[2026-05-03 05:47:36,551] - INFO - prepview_engine_logger - Step 4: Saving Results to Database...
+[2026-05-03 05:47:36,551] - INFO - prepview_engine_logger - [SUCCESS] Chunk Q3 processed and stored successfully.
+[2026-05-03 06:06:18,566] - INFO - prepview_engine_logger -  Starting PrepView AI Engine...
+[2026-05-03 06:06:18,581] - INFO - prepview_engine_logger - YAML file 'config\config.yaml' loaded successfully.
+[2026-05-03 06:06:18,629] - INFO - prepview_engine_logger - YAML file 'config\params.yaml' loaded successfully.
+[2026-05-03 06:06:18,631] - INFO - prepview_engine_logger - Configuration files loaded and artifacts root directory ensured.
+[2026-05-03 06:06:18,700] - INFO - prepview_engine_logger -  [DB] Connected to PostgreSQL via Config Manager
+[2026-05-03 06:06:18,755] - INFO - prepview_engine_logger - Initializing Analysis Pipeline Components...
+[2026-05-03 06:06:18,762] - INFO - prepview_engine_logger - YAML file 'config\config.yaml' loaded successfully.
+[2026-05-03 06:06:18,814] - INFO - prepview_engine_logger - YAML file 'config\params.yaml' loaded successfully.
+[2026-05-03 06:06:18,819] - INFO - prepview_engine_logger - Configuration files loaded and artifacts root directory ensured.
+[2026-05-03 06:06:18,820] - INFO - prepview_engine_logger -  [DB] Connected to PostgreSQL via Config Manager
+[2026-05-03 06:06:18,822] - INFO - prepview_engine_logger - PreprocessingComponent Initialized.
+[2026-05-03 06:06:18,826] - INFO - prepview_engine_logger - Loading CV Model Configuration...
+[2026-05-03 06:06:18,826] - INFO - prepview_engine_logger - CVAnalyzerComponent Initialized.
+[2026-05-03 06:06:18,827] - INFO - prepview_engine_logger - Loading NLP Model Configuration...
+[2026-05-03 06:06:22,191] - INFO - sentence_transformers.SentenceTransformer - Use pytorch device_name: cpu
+[2026-05-03 06:06:22,191] - INFO - sentence_transformers.SentenceTransformer - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+[2026-05-03 06:06:26,693] - INFO - prepview_engine_logger - NLPAnalyzerComponent Initialized.
+[2026-05-03 06:06:26,694] - INFO - prepview_engine_logger - Loading Code Configuration...
+[2026-05-03 06:06:26,824] - INFO - prepview_engine_logger - Pipeline Components Ready.
+[2026-05-03 06:06:26,879] - INFO - prepview_engine_logger - Result Aggregator Initialized (with DB connection).
+[2026-05-03 06:06:26,880] - INFO - prepview_engine_logger -  Report Generator Initialized (Provider: groq, Model: llama-3.3-70b-versatile)
+[2026-05-03 06:06:26,880] - INFO - prepview_engine_logger -  All Systems Ready!
+[2026-05-03 06:08:18,718] - INFO - prepview_engine_logger - [START] Processing Code Chunk: Q4 for Session: session-1777768056533-pjqrdngea
+[2026-05-03 06:08:18,719] - INFO - prepview_engine_logger - Step 1: Running Code Analysis via AI...
+[2026-05-03 06:08:18,720] - INFO - prepview_engine_logger - --- Starting Full Interview Analysis for PYTHON submission ---
+[2026-05-03 06:08:18,721] - INFO - prepview_engine_logger - Code and video validated. Passing to Unified Scoring Engine...
+[2026-05-03 06:08:18,721] - INFO - prepview_engine_logger - Generating Final Interview Score...
+[2026-05-03 06:08:19,532] - INFO - prepview_engine_logger - --- Starting Master Proctoring Analysis for: cmop144l10000wcwrbqpxc85q_unknown_1777770498433-554426706.webm ---
+[2026-05-03 06:09:07,859] - INFO - prepview_engine_logger - --- Finished. Cheating Suspected: True ---
+[2026-05-03 06:09:07,861] - INFO - prepview_engine_logger - Analysis Complete! Tech Score: 84/100 | Final Penalized Score: 69/100
+[2026-05-03 06:09:07,869] - INFO - prepview_engine_logger - --- Finished Full Interview Analysis Component ---
+[2026-05-03 06:09:07,872] - ERROR - prepview_engine_logger - Code Pipeline Crashed for Q4: a coroutine was expected, got {'success': True, 'original_technical_score': 84, 'score_with_penalties': 69, 'proctoring_results': {'is_cheating_suspected': True, 'reasons': ['Candidate frequently looked away from the screen (for ~14.5 seconds).'], 'stats': {'total_video_duration_analyzed_seconds': 76.5, 'phone_detected_seconds': 0.0, 'book_or_laptop_detected_seconds': 0.0, 'multiple_people_seconds': 1.0, 'away_from_camera_seconds': 1.0, 'gaze_away_seconds': 14.5, 'multiple_people_pct': 1.31, 'away_from_camera_pct': 1.31, 'gaze_away_pct': 18.95}}}
+[2026-05-03 06:12:48,417] - INFO - prepview_engine_logger -  Starting PrepView AI Engine...
+[2026-05-03 06:12:48,422] - INFO - prepview_engine_logger - YAML file 'config\config.yaml' loaded successfully.
+[2026-05-03 06:12:48,460] - INFO - prepview_engine_logger - YAML file 'config\params.yaml' loaded successfully.
+[2026-05-03 06:12:48,463] - INFO - prepview_engine_logger - Configuration files loaded and artifacts root directory ensured.
+[2026-05-03 06:12:48,507] - INFO - prepview_engine_logger -  [DB] Connected to PostgreSQL via Config Manager
+[2026-05-03 06:12:48,546] - INFO - prepview_engine_logger - Initializing Analysis Pipeline Components...
+[2026-05-03 06:12:48,551] - INFO - prepview_engine_logger - YAML file 'config\config.yaml' loaded successfully.
+[2026-05-03 06:12:48,583] - INFO - prepview_engine_logger - YAML file 'config\params.yaml' loaded successfully.
+[2026-05-03 06:12:48,585] - INFO - prepview_engine_logger - Configuration files loaded and artifacts root directory ensured.
+[2026-05-03 06:12:48,588] - INFO - prepview_engine_logger -  [DB] Connected to PostgreSQL via Config Manager
+[2026-05-03 06:12:48,589] - INFO - prepview_engine_logger - PreprocessingComponent Initialized.
+[2026-05-03 06:12:48,589] - INFO - prepview_engine_logger - Loading CV Model Configuration...
+[2026-05-03 06:12:48,592] - INFO - prepview_engine_logger - CVAnalyzerComponent Initialized.
+[2026-05-03 06:12:48,593] - INFO - prepview_engine_logger - Loading NLP Model Configuration...
+[2026-05-03 06:12:51,461] - INFO - sentence_transformers.SentenceTransformer - Use pytorch device_name: cpu
+[2026-05-03 06:12:51,462] - INFO - sentence_transformers.SentenceTransformer - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+[2026-05-03 06:12:56,147] - INFO - prepview_engine_logger - NLPAnalyzerComponent Initialized.
+[2026-05-03 06:12:56,151] - INFO - prepview_engine_logger - Loading Code Configuration...
+[2026-05-03 06:12:56,210] - INFO - prepview_engine_logger - Pipeline Components Ready.
+[2026-05-03 06:12:56,269] - INFO - prepview_engine_logger - Result Aggregator Initialized (with DB connection).
+[2026-05-03 06:12:56,271] - INFO - prepview_engine_logger -  Report Generator Initialized (Provider: groq, Model: llama-3.3-70b-versatile)
+[2026-05-03 06:12:56,273] - INFO - prepview_engine_logger -  All Systems Ready!
+[2026-05-03 06:15:10,773] - INFO - prepview_engine_logger - [START] Processing Code Chunk: Q5 for Session: session-1777768056533-pjqrdngea
+[2026-05-03 06:15:10,776] - INFO - prepview_engine_logger - Step 1: Running Code Analysis via AI...
+[2026-05-03 06:15:10,776] - INFO - prepview_engine_logger - --- Starting Full Interview Analysis for PYTHON submission ---
+[2026-05-03 06:15:10,780] - INFO - prepview_engine_logger - Code and video validated. Passing to Unified Scoring Engine...
+[2026-05-03 06:15:10,781] - INFO - prepview_engine_logger - Generating Final Interview Score...
+[2026-05-03 06:15:11,769] - INFO - prepview_engine_logger - --- Starting Master Proctoring Analysis for: cmop144l10000wcwrbqpxc85q_unknown_1777770910313-566515678.webm ---
+[2026-05-03 06:16:07,047] - INFO - prepview_engine_logger - --- Finished. Cheating Suspected: True ---
+[2026-05-03 06:16:07,048] - INFO - prepview_engine_logger - Analysis Complete! Tech Score: 84/100 | Final Penalized Score: 69/100
+[2026-05-03 06:16:07,054] - INFO - prepview_engine_logger - --- Finished Full Interview Analysis Component ---
+[2026-05-03 06:16:07,054] - INFO - prepview_engine_logger - Step 2: Saving Code Evaluation Results to Database...
+[2026-05-03 06:16:07,057] - ERROR - prepview_engine_logger - Code Pipeline Crashed for Q5: DatabaseConnector.save_code_results() missing 1 required positional argument: 'question_id'
+[2026-05-03 06:18:51,709] - INFO - prepview_engine_logger - [START] Processing Chunk: Q1 for Session: session-1777771115012-xr0azwqz6
+[2026-05-03 06:18:51,713] - INFO - prepview_engine_logger - Step 1: Extracting Audio...
+[2026-05-03 06:18:51,716] - INFO - prepview_engine_logger - --- Processing Video: cmop144l10000wcwrbqpxc85q_unknown_1777771131658-920955603.webm ---
+[2026-05-03 06:18:51,719] - INFO - prepview_engine_logger - Starting audio extraction for: cmop144l10000wcwrbqpxc85q_unknown_1777771131658-920955603.webm
+[2026-05-03 06:18:52,050] - INFO - prepview_engine_logger - Audio saved to: artifacts\temp_uploads\cmop144l10000wcwrbqpxc85q_unknown_1777771131658-920955603_audio.wav
+[2026-05-03 06:18:52,052] - INFO - prepview_engine_logger - Step 2: Running CV Analysis...
+[2026-05-03 06:18:52,055] - INFO - prepview_engine_logger - --- Starting CV Analysis for: cmop144l10000wcwrbqpxc85q_unknown_1777771131658-920955603.webm ---
+[2026-05-03 06:18:52,060] - INFO - prepview_engine_logger - Starting Head Movement Analysis...
+[2026-05-03 06:18:53,023] - INFO - prepview_engine_logger - Starting Eye Gaze Analysis (Single Pass Strategy)...
+[2026-05-03 06:18:54,288] - INFO - prepview_engine_logger - Starting Expression & Nervousness Analysis...
+[2026-05-03 06:18:55,690] - INFO - prepview_engine_logger - Expression Analysis Done. Dominant: neutral
+[2026-05-03 06:18:55,693] - INFO - prepview_engine_logger - --- Finished CV Analysis Component ---
+[2026-05-03 06:18:55,694] - INFO - prepview_engine_logger - Step 3: Running NLP Analysis...
+[2026-05-03 06:18:55,696] - INFO - prepview_engine_logger - Running NLP Analysis for: cmop144l10000wcwrbqpxc85q_unknown_1777771131658-920955603_audio.wav...
+[2026-05-03 06:19:04,363] - WARNING - prepview_engine_logger - Transcript is empty. Returning default metrics.
+[2026-05-03 06:19:04,363] - INFO - prepview_engine_logger - Step 4: Saving Results to Database...
+[2026-05-03 06:19:04,365] - ERROR - prepview_engine_logger -  Failed to save chunk: 'DatabaseConnector' object has no attribute 'db'
+Traceback (most recent call last):
+  File "C:\Users\Inshal Munaf\Desktop\prepview_app\server\src\prepview_engine\database\db_connector.py", line 50, in save_chunk_results
+    if not self.db.is_connected():
+           ^^^^^^^
+AttributeError: 'DatabaseConnector' object has no attribute 'db'
+[2026-05-03 06:19:04,371] - ERROR - prepview_engine_logger - [FAILURE] Analysis done but Database Save failed for Q1.
+[2026-05-03 06:40:46,118] - INFO - prepview_engine_logger -  Starting PrepView AI Engine...
+[2026-05-03 06:40:46,121] - INFO - prepview_engine_logger - YAML file 'config\config.yaml' loaded successfully.
+[2026-05-03 06:40:46,136] - INFO - prepview_engine_logger - YAML file 'config\params.yaml' loaded successfully.
+[2026-05-03 06:40:46,138] - INFO - prepview_engine_logger - Configuration files loaded and artifacts root directory ensured.
+[2026-05-03 06:40:46,160] - INFO - prepview_engine_logger -  [DB] Connected to PostgreSQL via Config Manager
+[2026-05-03 06:40:46,178] - INFO - prepview_engine_logger - Initializing Analysis Pipeline Components...
+[2026-05-03 06:40:46,181] - INFO - prepview_engine_logger - YAML file 'config\config.yaml' loaded successfully.
+[2026-05-03 06:40:46,200] - INFO - prepview_engine_logger - YAML file 'config\params.yaml' loaded successfully.
+[2026-05-03 06:40:46,229] - INFO - prepview_engine_logger - Configuration files loaded and artifacts root directory ensured.
+[2026-05-03 06:40:46,243] - INFO - prepview_engine_logger -  [DB] Connected to PostgreSQL via Config Manager
+[2026-05-03 06:40:46,245] - INFO - prepview_engine_logger - PreprocessingComponent Initialized.
+[2026-05-03 06:40:46,249] - INFO - prepview_engine_logger - Loading CV Model Configuration...
+[2026-05-03 06:40:46,249] - INFO - prepview_engine_logger - CVAnalyzerComponent Initialized.
+[2026-05-03 06:40:46,250] - INFO - prepview_engine_logger - Loading NLP Model Configuration...
+[2026-05-03 06:40:48,133] - INFO - sentence_transformers.SentenceTransformer - Use pytorch device_name: cpu
+[2026-05-03 06:40:48,133] - INFO - sentence_transformers.SentenceTransformer - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+[2026-05-03 06:40:51,993] - INFO - prepview_engine_logger - NLPAnalyzerComponent Initialized.
+[2026-05-03 06:40:51,994] - INFO - prepview_engine_logger - Loading Code Configuration...
+[2026-05-03 06:40:52,006] - INFO - prepview_engine_logger - Pipeline Components Ready.
+[2026-05-03 06:40:52,016] - INFO - prepview_engine_logger - Result Aggregator Initialized (with DB connection).
+[2026-05-03 06:40:52,016] - INFO - prepview_engine_logger -  Report Generator Initialized (Provider: groq, Model: llama-3.3-70b-versatile)
+[2026-05-03 06:40:52,016] - INFO - prepview_engine_logger -  All Systems Ready!
+[2026-05-03 06:41:29,824] - INFO - prepview_engine_logger - [START] Processing Chunk: Q2 for Session: session-1777771115012-xr0azwqz6
+[2026-05-03 06:41:29,825] - INFO - prepview_engine_logger - Step 1: Extracting Audio...
+[2026-05-03 06:41:29,826] - INFO - prepview_engine_logger - --- Processing Video: cmop144l10000wcwrbqpxc85q_unknown_1777772489787-219288127.webm ---
+[2026-05-03 06:41:29,828] - INFO - prepview_engine_logger - Starting audio extraction for: cmop144l10000wcwrbqpxc85q_unknown_1777772489787-219288127.webm
+[2026-05-03 06:41:29,924] - INFO - prepview_engine_logger - Audio saved to: artifacts\temp_uploads\cmop144l10000wcwrbqpxc85q_unknown_1777772489787-219288127_audio.wav
+[2026-05-03 06:41:29,924] - INFO - prepview_engine_logger - Step 2: Running CV Analysis...
+[2026-05-03 06:41:29,924] - INFO - prepview_engine_logger - --- Starting CV Analysis for: cmop144l10000wcwrbqpxc85q_unknown_1777772489787-219288127.webm ---
+[2026-05-03 06:41:29,924] - INFO - prepview_engine_logger - Starting Head Movement Analysis...
+[2026-05-03 06:41:31,331] - INFO - prepview_engine_logger - Starting Eye Gaze Analysis (Single Pass Strategy)...
+[2026-05-03 06:41:33,061] - INFO - prepview_engine_logger - Starting Expression & Nervousness Analysis...
+[2026-05-03 06:41:34,025] - INFO - prepview_engine_logger - Expression Analysis Done. Dominant: concerned
+[2026-05-03 06:41:34,026] - INFO - prepview_engine_logger - --- Finished CV Analysis Component ---
+[2026-05-03 06:41:34,026] - INFO - prepview_engine_logger - Step 3: Running NLP Analysis...
+[2026-05-03 06:41:34,027] - INFO - prepview_engine_logger - Running NLP Analysis for: cmop144l10000wcwrbqpxc85q_unknown_1777772489787-219288127_audio.wav...
+[2026-05-03 06:41:52,151] - INFO - prepview_engine_logger - NLP Analysis Complete. Score: 81.0/100
+[2026-05-03 06:41:52,151] - INFO - prepview_engine_logger - Step 4: Saving Results to Database...
+[2026-05-03 06:41:57,635] - INFO - prepview_engine_logger -  Verbal Chunk saved successfully: Session=session-1777771115012-xr0azwqz6 | Q=Q2
+[2026-05-03 06:41:57,840] - INFO - prepview_engine_logger - [SUCCESS] Chunk Q2 processed and stored successfully.
+[2026-05-03 06:42:40,202] - INFO - prepview_engine_logger - [START] Processing Chunk: Q3 for Session: session-1777771115012-xr0azwqz6
+[2026-05-03 06:42:40,203] - INFO - prepview_engine_logger - Step 1: Extracting Audio...
+[2026-05-03 06:42:40,203] - INFO - prepview_engine_logger - --- Processing Video: cmop144l10000wcwrbqpxc85q_unknown_1777772560191-128528827.webm ---
+[2026-05-03 06:42:40,204] - INFO - prepview_engine_logger - Starting audio extraction for: cmop144l10000wcwrbqpxc85q_unknown_1777772560191-128528827.webm
+[2026-05-03 06:42:40,281] - INFO - prepview_engine_logger - Audio saved to: artifacts\temp_uploads\cmop144l10000wcwrbqpxc85q_unknown_1777772560191-128528827_audio.wav
+[2026-05-03 06:42:40,281] - INFO - prepview_engine_logger - Step 2: Running CV Analysis...
+[2026-05-03 06:42:40,283] - INFO - prepview_engine_logger - --- Starting CV Analysis for: cmop144l10000wcwrbqpxc85q_unknown_1777772560191-128528827.webm ---
+[2026-05-03 06:42:40,283] - INFO - prepview_engine_logger - Starting Head Movement Analysis...
+[2026-05-03 06:42:40,607] - INFO - prepview_engine_logger - Starting Eye Gaze Analysis (Single Pass Strategy)...
+[2026-05-03 06:42:41,105] - INFO - prepview_engine_logger - Starting Expression & Nervousness Analysis...
+[2026-05-03 06:42:41,568] - INFO - prepview_engine_logger - Expression Analysis Done. Dominant: neutral
+[2026-05-03 06:42:41,568] - INFO - prepview_engine_logger - --- Finished CV Analysis Component ---
+[2026-05-03 06:42:41,569] - INFO - prepview_engine_logger - Step 3: Running NLP Analysis...
+[2026-05-03 06:42:41,569] - INFO - prepview_engine_logger - Running NLP Analysis for: cmop144l10000wcwrbqpxc85q_unknown_1777772560191-128528827_audio.wav...
+[2026-05-03 06:42:46,081] - INFO - prepview_engine_logger - NLP Analysis Complete. Score: 79.0/100
+[2026-05-03 06:42:46,083] - INFO - prepview_engine_logger - Step 4: Saving Results to Database...
+[2026-05-03 06:42:47,696] - INFO - prepview_engine_logger -  Verbal Chunk saved successfully: Session=session-1777771115012-xr0azwqz6 | Q=Q3
+[2026-05-03 06:42:47,899] - INFO - prepview_engine_logger - [SUCCESS] Chunk Q3 processed and stored successfully.
+[2026-05-03 06:45:38,799] - INFO - prepview_engine_logger - [START] Processing Code Chunk: Q4 for Session: session-1777771115012-xr0azwqz6
+[2026-05-03 06:45:38,801] - INFO - prepview_engine_logger - Step 1: Running Code Analysis via AI...
+[2026-05-03 06:45:38,802] - INFO - prepview_engine_logger - --- Starting Full Interview Analysis for PYTHON submission ---
+[2026-05-03 06:45:38,803] - INFO - prepview_engine_logger - Code and video validated. Passing to Unified Scoring Engine...
+[2026-05-03 06:45:38,804] - INFO - prepview_engine_logger - Generating Final Interview Score...
+[2026-05-03 06:45:39,534] - INFO - prepview_engine_logger - --- Starting Master Proctoring Analysis for: cmop144l10000wcwrbqpxc85q_unknown_1777772738721-688607890.webm ---
+[2026-05-03 06:46:17,402] - INFO - prepview_engine_logger - --- Finished. Cheating Suspected: True ---
+[2026-05-03 06:46:17,403] - INFO - prepview_engine_logger - Analysis Complete! Tech Score: 84/100 | Final Penalized Score: 69/100
+[2026-05-03 06:46:17,411] - INFO - prepview_engine_logger - --- Finished Full Interview Analysis Component ---
+[2026-05-03 06:46:17,411] - INFO - prepview_engine_logger - Step 2: Saving Code Evaluation Results to Database...
+[2026-05-03 06:46:19,043] - INFO - prepview_engine_logger -  Code DB Save Successful! Session=session-1777771115012-xr0azwqz6 | Q=Q4
+[2026-05-03 06:46:19,246] - INFO - prepview_engine_logger - [SUCCESS] Code Chunk Q4 processed and stored successfully.
+[2026-05-03 14:36:23,556] - INFO - prepview_engine_logger -  Starting PrepView AI Engine...
+[2026-05-03 14:36:23,567] - INFO - prepview_engine_logger - YAML file 'config\config.yaml' loaded successfully.
+[2026-05-03 14:36:23,607] - INFO - prepview_engine_logger - YAML file 'config\params.yaml' loaded successfully.
+[2026-05-03 14:36:23,607] - INFO - prepview_engine_logger - Configuration files loaded and artifacts root directory ensured.
+[2026-05-03 14:36:23,688] - INFO - prepview_engine_logger -  [DB] Connected to PostgreSQL via Config Manager
+[2026-05-03 14:36:23,748] - INFO - prepview_engine_logger - Initializing Analysis Pipeline Components...
+[2026-05-03 14:36:23,777] - INFO - prepview_engine_logger - YAML file 'config\config.yaml' loaded successfully.
+[2026-05-03 14:36:23,827] - INFO - prepview_engine_logger - YAML file 'config\params.yaml' loaded successfully.
+[2026-05-03 14:36:23,827] - INFO - prepview_engine_logger - Configuration files loaded and artifacts root directory ensured.
+[2026-05-03 14:36:23,827] - INFO - prepview_engine_logger -  [DB] Connected to PostgreSQL via Config Manager
+[2026-05-03 14:36:23,842] - INFO - prepview_engine_logger - PreprocessingComponent Initialized.
+[2026-05-03 14:36:23,842] - INFO - prepview_engine_logger - Loading CV Model Configuration...
+[2026-05-03 14:36:23,844] - INFO - prepview_engine_logger - CVAnalyzerComponent Initialized.
+[2026-05-03 14:36:23,844] - INFO - prepview_engine_logger - Loading NLP Model Configuration...
+[2026-05-03 14:36:28,853] - INFO - sentence_transformers.SentenceTransformer - Use pytorch device_name: cpu
+[2026-05-03 14:36:28,853] - INFO - sentence_transformers.SentenceTransformer - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+[2026-05-03 14:36:34,375] - INFO - prepview_engine_logger - NLPAnalyzerComponent Initialized.
+[2026-05-03 14:36:34,376] - INFO - prepview_engine_logger - Loading Code Configuration...
+[2026-05-03 14:36:34,452] - INFO - prepview_engine_logger - Pipeline Components Ready.
+[2026-05-03 14:36:34,516] - INFO - prepview_engine_logger - Result Aggregator Initialized (with DB connection).
+[2026-05-03 14:36:34,517] - INFO - prepview_engine_logger -  Report Generator Initialized (Provider: groq, Model: llama-3.3-70b-versatile)
+[2026-05-03 14:36:34,517] - INFO - prepview_engine_logger -  All Systems Ready!
+[2026-05-03 14:39:46,584] - INFO - prepview_engine_logger - [START] Processing Chunk: Q1 for Session: session-1777801160484-t2zm9nah3
+[2026-05-03 14:39:46,585] - INFO - prepview_engine_logger - Step 1: Extracting Audio...
+[2026-05-03 14:39:46,585] - INFO - prepview_engine_logger - --- Processing Video: cmop144l10000wcwrbqpxc85q_unknown_1777801186312-520771035.webm ---
+[2026-05-03 14:39:46,593] - INFO - prepview_engine_logger - Starting audio extraction for: cmop144l10000wcwrbqpxc85q_unknown_1777801186312-520771035.webm
+[2026-05-03 14:39:47,011] - INFO - prepview_engine_logger - Audio saved to: artifacts\temp_uploads\cmop144l10000wcwrbqpxc85q_unknown_1777801186312-520771035_audio.wav
+[2026-05-03 14:39:47,012] - INFO - prepview_engine_logger - Step 2: Running CV Analysis...
+[2026-05-03 14:39:47,013] - INFO - prepview_engine_logger - --- Starting CV Analysis for: cmop144l10000wcwrbqpxc85q_unknown_1777801186312-520771035.webm ---
+[2026-05-03 14:39:47,016] - INFO - prepview_engine_logger - Starting Head Movement Analysis...
+[2026-05-03 14:39:50,897] - INFO - prepview_engine_logger - Starting Eye Gaze Analysis (Single Pass Strategy)...
+[2026-05-03 14:39:55,928] - INFO - prepview_engine_logger - Starting Expression & Nervousness Analysis...
+[2026-05-03 14:39:59,111] - INFO - prepview_engine_logger - Expression Analysis Done. Dominant: neutral
+[2026-05-03 14:39:59,114] - INFO - prepview_engine_logger - --- Finished CV Analysis Component ---
+[2026-05-03 14:39:59,116] - INFO - prepview_engine_logger - Step 3: Running NLP Analysis...
+[2026-05-03 14:39:59,118] - INFO - prepview_engine_logger - Running NLP Analysis for: cmop144l10000wcwrbqpxc85q_unknown_1777801186312-520771035_audio.wav...
+[2026-05-03 14:40:55,514] - INFO - prepview_engine_logger - [START] Processing Chunk: Q2 for Session: session-1777801160484-t2zm9nah3
+[2026-05-03 14:40:55,524] - INFO - prepview_engine_logger - Step 1: Extracting Audio...
+[2026-05-03 14:40:55,527] - INFO - prepview_engine_logger - --- Processing Video: cmop144l10000wcwrbqpxc85q_unknown_1777801238242-126128247.webm ---
+[2026-05-03 14:40:55,537] - INFO - prepview_engine_logger - Starting audio extraction for: cmop144l10000wcwrbqpxc85q_unknown_1777801238242-126128247.webm
+[2026-05-03 14:40:55,691] - INFO - prepview_engine_logger - NLP Analysis Complete. Score: 83.0/100
+[2026-05-03 14:40:55,693] - INFO - prepview_engine_logger - Step 4: Saving Results to Database...
+[2026-05-03 14:40:55,849] - INFO - prepview_engine_logger - Audio saved to: artifacts\temp_uploads\cmop144l10000wcwrbqpxc85q_unknown_1777801238242-126128247_audio.wav
+[2026-05-03 14:40:55,851] - INFO - prepview_engine_logger - Step 2: Running CV Analysis...
+[2026-05-03 14:40:55,852] - INFO - prepview_engine_logger - --- Starting CV Analysis for: cmop144l10000wcwrbqpxc85q_unknown_1777801238242-126128247.webm ---
+[2026-05-03 14:40:55,852] - INFO - prepview_engine_logger - Starting Head Movement Analysis...
+[2026-05-03 14:41:03,810] - INFO - prepview_engine_logger -  Verbal Chunk saved successfully: Session=session-1777801160484-t2zm9nah3 | Q=Q1
+[2026-05-03 14:41:04,015] - INFO - prepview_engine_logger - [SUCCESS] Chunk Q1 processed and stored successfully.
+[2026-05-03 14:41:10,323] - INFO - prepview_engine_logger - Starting Eye Gaze Analysis (Single Pass Strategy)...
+[2026-05-03 14:41:23,023] - INFO - prepview_engine_logger - Starting Expression & Nervousness Analysis...
+[2026-05-03 14:41:26,984] - INFO - prepview_engine_logger - Expression Analysis Done. Dominant: neutral
+[2026-05-03 14:41:26,984] - INFO - prepview_engine_logger - --- Finished CV Analysis Component ---
+[2026-05-03 14:41:26,985] - INFO - prepview_engine_logger - Step 3: Running NLP Analysis...
+[2026-05-03 14:41:26,985] - INFO - prepview_engine_logger - Running NLP Analysis for: cmop144l10000wcwrbqpxc85q_unknown_1777801238242-126128247_audio.wav...
+[2026-05-03 14:43:11,324] - INFO - prepview_engine_logger - [START] Processing Chunk: Q3 for Session: session-1777801160484-t2zm9nah3
+[2026-05-03 14:43:11,327] - INFO - prepview_engine_logger - Step 1: Extracting Audio...
+[2026-05-03 14:43:11,329] - INFO - prepview_engine_logger - --- Processing Video: cmop144l10000wcwrbqpxc85q_unknown_1777801306838-828594976.webm ---
+[2026-05-03 14:43:11,331] - INFO - prepview_engine_logger - Starting audio extraction for: cmop144l10000wcwrbqpxc85q_unknown_1777801306838-828594976.webm
+[2026-05-03 14:43:11,696] - INFO - prepview_engine_logger - Audio saved to: artifacts\temp_uploads\cmop144l10000wcwrbqpxc85q_unknown_1777801306838-828594976_audio.wav
+[2026-05-03 14:43:11,698] - INFO - prepview_engine_logger - Step 2: Running CV Analysis...
+[2026-05-03 14:43:11,698] - INFO - prepview_engine_logger - --- Starting CV Analysis for: cmop144l10000wcwrbqpxc85q_unknown_1777801306838-828594976.webm ---
+[2026-05-03 14:43:11,698] - INFO - prepview_engine_logger - Starting Head Movement Analysis...
+[2026-05-03 14:43:11,713] - INFO - prepview_engine_logger - NLP Analysis Complete. Score: 44.0/100
+[2026-05-03 14:43:11,753] - INFO - prepview_engine_logger - Step 4: Saving Results to Database...
+[2026-05-03 14:43:13,363] - INFO - prepview_engine_logger -  Verbal Chunk saved successfully: Session=session-1777801160484-t2zm9nah3 | Q=Q2
+[2026-05-03 14:43:13,565] - INFO - prepview_engine_logger - [SUCCESS] Chunk Q2 processed and stored successfully.
+[2026-05-03 14:43:15,255] - INFO - prepview_engine_logger - [START] Processing Code Chunk: Q4 for Session: session-1777801160484-t2zm9nah3
+[2026-05-03 14:43:15,256] - INFO - prepview_engine_logger - Step 1: Running Code Analysis via AI...
+[2026-05-03 14:43:15,256] - INFO - prepview_engine_logger - --- Starting Full Interview Analysis for PYTHON submission ---
+[2026-05-03 14:43:15,260] - INFO - prepview_engine_logger - Code and video validated. Passing to Unified Scoring Engine...
+[2026-05-03 14:43:15,260] - INFO - prepview_engine_logger - Generating Final Interview Score...
+[2026-05-03 14:43:16,277] - INFO - prepview_engine_logger - --- Starting Master Proctoring Analysis for: cmop144l10000wcwrbqpxc85q_unknown_1777801394838-812307386.webm ---
+[2026-05-03 14:43:23,768] - INFO - prepview_engine_logger - Starting Eye Gaze Analysis (Single Pass Strategy)...
+[2026-05-03 14:43:37,982] - INFO - prepview_engine_logger - Starting Expression & Nervousness Analysis...
+[2026-05-03 14:43:43,790] - INFO - prepview_engine_logger - Expression Analysis Done. Dominant: surprise
+[2026-05-03 14:43:43,790] - INFO - prepview_engine_logger - --- Finished CV Analysis Component ---
+[2026-05-03 14:43:43,792] - INFO - prepview_engine_logger - Step 3: Running NLP Analysis...
+[2026-05-03 14:43:43,792] - INFO - prepview_engine_logger - Running NLP Analysis for: cmop144l10000wcwrbqpxc85q_unknown_1777801306838-828594976_audio.wav...
+[2026-05-03 14:45:44,100] - INFO - prepview_engine_logger - [START] Processing Code Chunk: Q5 for Session: session-1777801160484-t2zm9nah3
+[2026-05-03 14:45:44,105] - INFO - prepview_engine_logger - Step 1: Running Code Analysis via AI...
+[2026-05-03 14:45:44,105] - INFO - prepview_engine_logger - --- Starting Full Interview Analysis for PYTHON submission ---
+[2026-05-03 14:45:44,108] - INFO - prepview_engine_logger - Code and video validated. Passing to Unified Scoring Engine...
+[2026-05-03 14:45:44,108] - INFO - prepview_engine_logger - Generating Final Interview Score...
+[2026-05-03 14:45:44,393] - INFO - prepview_engine_logger - NLP Analysis Complete. Score: 61.0/100
+[2026-05-03 14:45:44,395] - INFO - prepview_engine_logger - Step 4: Saving Results to Database...
+[2026-05-03 14:45:44,784] - INFO - prepview_engine_logger - --- Starting Master Proctoring Analysis for: cmop144l10000wcwrbqpxc85q_unknown_1777801506958-870221230.webm ---
+[2026-05-03 14:45:46,001] - INFO - prepview_engine_logger -  Verbal Chunk saved successfully: Session=session-1777801160484-t2zm9nah3 | Q=Q3
+[2026-05-03 14:45:46,209] - INFO - prepview_engine_logger - [SUCCESS] Chunk Q3 processed and stored successfully.
+[2026-05-03 14:46:09,412] - INFO - prepview_engine_logger - --- Finished. Cheating Suspected: True ---
+[2026-05-03 14:46:09,415] - INFO - prepview_engine_logger - Analysis Complete! Tech Score: 96/100 | Final Penalized Score: 0/100
+[2026-05-03 14:46:09,418] - INFO - prepview_engine_logger - --- Finished Full Interview Analysis Component ---
+[2026-05-03 14:46:09,418] - INFO - prepview_engine_logger - Step 2: Saving Code Evaluation Results to Database...
+[2026-05-03 14:46:11,085] - INFO - prepview_engine_logger -  Code DB Save Successful! Session=session-1777801160484-t2zm9nah3 | Q=Q4
+[2026-05-03 14:46:11,294] - INFO - prepview_engine_logger - [SUCCESS] Code Chunk Q4 processed and stored successfully.
+[2026-05-03 14:46:32,907] - INFO - prepview_engine_logger - --- Finished. Cheating Suspected: True ---
+[2026-05-03 14:46:32,910] - INFO - prepview_engine_logger - Analysis Complete! Tech Score: 88/100 | Final Penalized Score: 33/100
+[2026-05-03 14:46:32,918] - INFO - prepview_engine_logger - --- Finished Full Interview Analysis Component ---
+[2026-05-03 14:46:32,918] - INFO - prepview_engine_logger - Step 2: Saving Code Evaluation Results to Database...
+[2026-05-03 14:46:34,539] - INFO - prepview_engine_logger -  Code DB Save Successful! Session=session-1777801160484-t2zm9nah3 | Q=Q5
+[2026-05-03 14:46:34,747] - INFO - prepview_engine_logger - [SUCCESS] Code Chunk Q5 processed and stored successfully.
+[2026-05-03 14:49:13,517] - INFO - prepview_engine_logger - [START] Processing Chunk: Q1 for Session: session-1777801735904-xbo06o6ej
+[2026-05-03 14:49:13,521] - INFO - prepview_engine_logger - Step 1: Extracting Audio...
+[2026-05-03 14:49:13,528] - INFO - prepview_engine_logger - --- Processing Video: cmop144l10000wcwrbqpxc85q_unknown_1777801753463-28396631.webm ---
+[2026-05-03 14:49:13,533] - INFO - prepview_engine_logger - Starting audio extraction for: cmop144l10000wcwrbqpxc85q_unknown_1777801753463-28396631.webm
+[2026-05-03 14:49:13,767] - INFO - prepview_engine_logger - Audio saved to: artifacts\temp_uploads\cmop144l10000wcwrbqpxc85q_unknown_1777801753463-28396631_audio.wav
+[2026-05-03 14:49:13,770] - INFO - prepview_engine_logger - Step 2: Running CV Analysis...
+[2026-05-03 14:49:13,770] - INFO - prepview_engine_logger - --- Starting CV Analysis for: cmop144l10000wcwrbqpxc85q_unknown_1777801753463-28396631.webm ---
+[2026-05-03 14:49:13,770] - INFO - prepview_engine_logger - Starting Head Movement Analysis...
+[2026-05-03 14:49:14,552] - INFO - prepview_engine_logger - Starting Eye Gaze Analysis (Single Pass Strategy)...
+[2026-05-03 14:49:15,915] - INFO - prepview_engine_logger - Starting Expression & Nervousness Analysis...
+[2026-05-03 14:49:17,259] - INFO - prepview_engine_logger - Expression Analysis Done. Dominant: neutral
+[2026-05-03 14:49:17,262] - INFO - prepview_engine_logger - --- Finished CV Analysis Component ---
+[2026-05-03 14:49:17,262] - INFO - prepview_engine_logger - Step 3: Running NLP Analysis...
+[2026-05-03 14:49:17,262] - INFO - prepview_engine_logger - Running NLP Analysis for: cmop144l10000wcwrbqpxc85q_unknown_1777801753463-28396631_audio.wav...
+[2026-05-03 14:49:28,072] - INFO - prepview_engine_logger - NLP Analysis Complete. Score: 79.0/100
+[2026-05-03 14:49:28,072] - INFO - prepview_engine_logger - Step 4: Saving Results to Database...
+[2026-05-03 14:49:30,052] - INFO - prepview_engine_logger -  Verbal Chunk saved successfully: Session=session-1777801735904-xbo06o6ej | Q=Q1
+[2026-05-03 14:49:30,266] - INFO - prepview_engine_logger - [SUCCESS] Chunk Q1 processed and stored successfully.
+[2026-05-03 14:49:37,081] - INFO - prepview_engine_logger - [START] Processing Chunk: Q2 for Session: session-1777801735904-xbo06o6ej
+[2026-05-03 14:49:37,083] - INFO - prepview_engine_logger - Step 1: Extracting Audio...
+[2026-05-03 14:49:37,090] - INFO - prepview_engine_logger - --- Processing Video: cmop144l10000wcwrbqpxc85q_unknown_1777801776994-791585342.webm ---
+[2026-05-03 14:49:37,100] - INFO - prepview_engine_logger - Starting audio extraction for: cmop144l10000wcwrbqpxc85q_unknown_1777801776994-791585342.webm
+[2026-05-03 14:49:37,273] - INFO - prepview_engine_logger - Audio saved to: artifacts\temp_uploads\cmop144l10000wcwrbqpxc85q_unknown_1777801776994-791585342_audio.wav
+[2026-05-03 14:49:37,275] - INFO - prepview_engine_logger - Step 2: Running CV Analysis...
+[2026-05-03 14:49:37,276] - INFO - prepview_engine_logger - --- Starting CV Analysis for: cmop144l10000wcwrbqpxc85q_unknown_1777801776994-791585342.webm ---
+[2026-05-03 14:49:37,276] - INFO - prepview_engine_logger - Starting Head Movement Analysis...
+[2026-05-03 14:49:39,337] - INFO - prepview_engine_logger - Starting Eye Gaze Analysis (Single Pass Strategy)...
+[2026-05-03 14:49:41,190] - INFO - prepview_engine_logger - Starting Expression & Nervousness Analysis...
+[2026-05-03 14:49:42,797] - INFO - prepview_engine_logger - Expression Analysis Done. Dominant: neutral
+[2026-05-03 14:49:42,797] - INFO - prepview_engine_logger - --- Finished CV Analysis Component ---
+[2026-05-03 14:49:42,797] - INFO - prepview_engine_logger - Step 3: Running NLP Analysis...
+[2026-05-03 14:49:42,799] - INFO - prepview_engine_logger - Running NLP Analysis for: cmop144l10000wcwrbqpxc85q_unknown_1777801776994-791585342_audio.wav...
+[2026-05-03 14:50:08,489] - INFO - prepview_engine_logger - NLP Analysis Complete. Score: 67.0/100
+[2026-05-03 14:50:08,492] - INFO - prepview_engine_logger - Step 4: Saving Results to Database...
+[2026-05-03 14:50:10,091] - INFO - prepview_engine_logger -  Verbal Chunk saved successfully: Session=session-1777801735904-xbo06o6ej | Q=Q2
+[2026-05-03 14:50:10,294] - INFO - prepview_engine_logger - [SUCCESS] Chunk Q2 processed and stored successfully.
+[2026-05-03 14:50:17,640] - INFO - prepview_engine_logger - [START] Processing Chunk: Q3 for Session: session-1777801735904-xbo06o6ej
+[2026-05-03 14:50:17,642] - INFO - prepview_engine_logger - Step 1: Extracting Audio...
+[2026-05-03 14:50:17,642] - INFO - prepview_engine_logger - --- Processing Video: cmop144l10000wcwrbqpxc85q_unknown_1777801817515-45128557.webm ---
+[2026-05-03 14:50:17,645] - INFO - prepview_engine_logger - Starting audio extraction for: cmop144l10000wcwrbqpxc85q_unknown_1777801817515-45128557.webm
+[2026-05-03 14:50:17,821] - INFO - prepview_engine_logger - Audio saved to: artifacts\temp_uploads\cmop144l10000wcwrbqpxc85q_unknown_1777801817515-45128557_audio.wav
+[2026-05-03 14:50:17,824] - INFO - prepview_engine_logger - Step 2: Running CV Analysis...
+[2026-05-03 14:50:17,824] - INFO - prepview_engine_logger - --- Starting CV Analysis for: cmop144l10000wcwrbqpxc85q_unknown_1777801817515-45128557.webm ---
+[2026-05-03 14:50:17,826] - INFO - prepview_engine_logger - Starting Head Movement Analysis...
+[2026-05-03 14:50:22,832] - INFO - prepview_engine_logger - Starting Eye Gaze Analysis (Single Pass Strategy)...
+[2026-05-03 14:50:28,883] - INFO - prepview_engine_logger - Starting Expression & Nervousness Analysis...
+[2026-05-03 14:50:31,470] - INFO - prepview_engine_logger - Expression Analysis Done. Dominant: neutral
+[2026-05-03 14:50:31,470] - INFO - prepview_engine_logger - --- Finished CV Analysis Component ---
+[2026-05-03 14:50:31,473] - INFO - prepview_engine_logger - Step 3: Running NLP Analysis...
+[2026-05-03 14:50:31,473] - INFO - prepview_engine_logger - Running NLP Analysis for: cmop144l10000wcwrbqpxc85q_unknown_1777801817515-45128557_audio.wav...
+[2026-05-03 14:51:15,083] - INFO - prepview_engine_logger - NLP Analysis Complete. Score: 73.0/100
+[2026-05-03 14:51:15,086] - INFO - prepview_engine_logger - Step 4: Saving Results to Database...
+[2026-05-03 14:51:16,599] - INFO - prepview_engine_logger - [START] Processing Code Chunk: Q4 for Session: session-1777801735904-xbo06o6ej
+[2026-05-03 14:51:16,602] - INFO - prepview_engine_logger - Step 1: Running Code Analysis via AI...
+[2026-05-03 14:51:16,602] - INFO - prepview_engine_logger - --- Starting Full Interview Analysis for PYTHON submission ---
+[2026-05-03 14:51:16,609] - INFO - prepview_engine_logger - Code and video validated. Passing to Unified Scoring Engine...
+[2026-05-03 14:51:16,612] - INFO - prepview_engine_logger - Generating Final Interview Score...
+[2026-05-03 14:51:16,753] - INFO - prepview_engine_logger -  Verbal Chunk saved successfully: Session=session-1777801735904-xbo06o6ej | Q=Q3
+[2026-05-03 14:51:16,949] - INFO - prepview_engine_logger - [SUCCESS] Chunk Q3 processed and stored successfully.
+[2026-05-03 14:51:17,410] - INFO - prepview_engine_logger - --- Starting Master Proctoring Analysis for: cmop144l10000wcwrbqpxc85q_unknown_1777801876367-415479859.webm ---
+[2026-05-03 14:51:54,199] - INFO - prepview_engine_logger - --- Finished. Cheating Suspected: True ---
+[2026-05-03 14:51:54,202] - INFO - prepview_engine_logger - Analysis Complete! Tech Score: 96/100 | Final Penalized Score: 81/100
+[2026-05-03 14:51:54,211] - INFO - prepview_engine_logger - --- Finished Full Interview Analysis Component ---
+[2026-05-03 14:51:54,211] - INFO - prepview_engine_logger - Step 2: Saving Code Evaluation Results to Database...
+[2026-05-03 14:52:01,917] - INFO - prepview_engine_logger -  Code DB Save Successful! Session=session-1777801735904-xbo06o6ej | Q=Q4
+[2026-05-03 14:52:02,122] - INFO - prepview_engine_logger - [SUCCESS] Code Chunk Q4 processed and stored successfully.
+[2026-05-03 14:52:43,922] - INFO - prepview_engine_logger - [START] Processing Code Chunk: Q5 for Session: session-1777801735904-xbo06o6ej
+[2026-05-03 14:52:43,923] - INFO - prepview_engine_logger - Step 1: Running Code Analysis via AI...
+[2026-05-03 14:52:43,925] - INFO - prepview_engine_logger - --- Starting Full Interview Analysis for PYTHON submission ---
+[2026-05-03 14:52:43,968] - INFO - prepview_engine_logger - Code and video validated. Passing to Unified Scoring Engine...
+[2026-05-03 14:52:43,971] - INFO - prepview_engine_logger - Generating Final Interview Score...
+[2026-05-03 14:52:44,894] - INFO - prepview_engine_logger - --- Starting Master Proctoring Analysis for: cmop144l10000wcwrbqpxc85q_unknown_1777801963749-959688852.webm ---
+[2026-05-03 14:53:00,174] - INFO - prepview_engine_logger - --- Finished. Cheating Suspected: False ---
+[2026-05-03 14:53:00,177] - INFO - prepview_engine_logger - Analysis Complete! Tech Score: 32/100 | Final Penalized Score: 32/100
+[2026-05-03 14:53:00,178] - INFO - prepview_engine_logger - --- Finished Full Interview Analysis Component ---
+[2026-05-03 14:53:00,178] - INFO - prepview_engine_logger - Step 2: Saving Code Evaluation Results to Database...
+[2026-05-03 14:53:01,871] - INFO - prepview_engine_logger -  Code DB Save Successful! Session=session-1777801735904-xbo06o6ej | Q=Q5
+[2026-05-03 14:53:02,077] - INFO - prepview_engine_logger - [SUCCESS] Code Chunk Q5 processed and stored successfully.
+[2026-05-03 15:11:26,459] - INFO - prepview_engine_logger -  Starting PrepView AI Engine...
+[2026-05-03 15:11:26,460] - INFO - prepview_engine_logger - YAML file 'config\config.yaml' loaded successfully.
+[2026-05-03 15:11:26,491] - INFO - prepview_engine_logger - YAML file 'config\params.yaml' loaded successfully.
+[2026-05-03 15:11:26,493] - INFO - prepview_engine_logger - Configuration files loaded and artifacts root directory ensured.
+[2026-05-03 15:11:26,537] - INFO - prepview_engine_logger -  [DB] Connected to PostgreSQL via Config Manager
+[2026-05-03 15:11:26,576] - INFO - prepview_engine_logger - Initializing Analysis Pipeline Components...
+[2026-05-03 15:11:26,580] - INFO - prepview_engine_logger - YAML file 'config\config.yaml' loaded successfully.
+[2026-05-03 15:11:26,607] - INFO - prepview_engine_logger - YAML file 'config\params.yaml' loaded successfully.
+[2026-05-03 15:11:26,610] - INFO - prepview_engine_logger - Configuration files loaded and artifacts root directory ensured.
+[2026-05-03 15:11:26,612] - INFO - prepview_engine_logger -  [DB] Connected to PostgreSQL via Config Manager
+[2026-05-03 15:11:26,613] - INFO - prepview_engine_logger - PreprocessingComponent Initialized.
+[2026-05-03 15:11:26,614] - INFO - prepview_engine_logger - Loading CV Model Configuration...
+[2026-05-03 15:11:26,615] - INFO - prepview_engine_logger - CVAnalyzerComponent Initialized.
+[2026-05-03 15:11:26,615] - INFO - prepview_engine_logger - Loading NLP Model Configuration...
+[2026-05-03 15:11:29,599] - INFO - sentence_transformers.SentenceTransformer - Use pytorch device_name: cpu
+[2026-05-03 15:11:29,599] - INFO - sentence_transformers.SentenceTransformer - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+[2026-05-03 15:11:34,336] - INFO - prepview_engine_logger - NLPAnalyzerComponent Initialized.
+[2026-05-03 15:11:34,338] - INFO - prepview_engine_logger - Loading Code Configuration...
+[2026-05-03 15:11:34,386] - INFO - prepview_engine_logger - Pipeline Components Ready.
+[2026-05-03 15:11:34,435] - INFO - prepview_engine_logger - Result Aggregator Initialized (with DB connection).
+[2026-05-03 15:11:34,437] - INFO - prepview_engine_logger -  Report Generator Initialized (Provider: groq, Model: llama-3.3-70b-versatile)
+[2026-05-03 15:11:34,437] - INFO - prepview_engine_logger -  All Systems Ready!
+[2026-05-03 15:14:40,952] - INFO - prepview_engine_logger - Fetching chunks internally for Session: session-1777801735904-xbo06o6ej
+[2026-05-03 15:14:49,130] - INFO - prepview_engine_logger -  Final Report created for Session: session-1777801735904-xbo06o6ej
+[2026-05-03 15:54:19,626] - INFO - prepview_engine_logger -  Starting PrepView AI Engine...
+[2026-05-03 15:54:19,656] - INFO - prepview_engine_logger - YAML file 'config\config.yaml' loaded successfully.
+[2026-05-03 15:54:19,731] - INFO - prepview_engine_logger - YAML file 'config\params.yaml' loaded successfully.
+[2026-05-03 15:54:19,743] - INFO - prepview_engine_logger - Configuration files loaded and artifacts root directory ensured.
+[2026-05-03 15:54:20,102] - INFO - prepview_engine_logger -  [DB] Connected to PostgreSQL via Config Manager
+[2026-05-03 15:54:20,591] - INFO - prepview_engine_logger - Initializing Analysis Pipeline Components...
+[2026-05-03 15:54:20,597] - INFO - prepview_engine_logger - YAML file 'config\config.yaml' loaded successfully.
+[2026-05-03 15:54:20,620] - INFO - prepview_engine_logger - YAML file 'config\params.yaml' loaded successfully.
+[2026-05-03 15:54:20,632] - INFO - prepview_engine_logger - Configuration files loaded and artifacts root directory ensured.
+[2026-05-03 15:54:20,635] - INFO - prepview_engine_logger -  [DB] Connected to PostgreSQL via Config Manager
+[2026-05-03 15:54:20,637] - INFO - prepview_engine_logger - PreprocessingComponent Initialized.
+[2026-05-03 15:54:20,639] - INFO - prepview_engine_logger - Loading CV Model Configuration...
+[2026-05-03 15:54:20,640] - INFO - prepview_engine_logger - CVAnalyzerComponent Initialized.
+[2026-05-03 15:54:20,640] - INFO - prepview_engine_logger - Loading NLP Model Configuration...
+[2026-05-03 15:54:24,363] - INFO - sentence_transformers.SentenceTransformer - Use pytorch device_name: cpu
+[2026-05-03 15:54:24,378] - INFO - sentence_transformers.SentenceTransformer - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+[2026-05-03 15:54:31,092] - INFO - prepview_engine_logger - NLPAnalyzerComponent Initialized.
+[2026-05-03 15:54:31,093] - INFO - prepview_engine_logger - Loading Code Configuration...
+[2026-05-03 15:54:31,178] - INFO - prepview_engine_logger - Pipeline Components Ready.
+[2026-05-03 15:54:31,219] - INFO - prepview_engine_logger - Result Aggregator Initialized (with DB connection).
+[2026-05-03 15:54:31,219] - INFO - prepview_engine_logger -  Report Generator Initialized (Provider: groq, Model: llama-3.3-70b-versatile)
+[2026-05-03 15:54:31,222] - INFO - prepview_engine_logger -  All Systems Ready!
+[2026-05-03 15:54:47,019] - INFO - prepview_engine_logger - Fetching chunks internally for Session: session-1777801735904-xbo06o6ej
+[2026-05-03 15:54:55,149] - INFO - prepview_engine_logger -  Final Report created for Session: session-1777801735904-xbo06o6ej
+[2026-05-03 16:00:20,039] - INFO - prepview_engine_logger - Fetching chunks internally for Session: session-1777801735904-xbo06o6ej
+[2026-05-03 16:00:24,437] - INFO - prepview_engine_logger -  Final Report created for Session: session-1777801735904-xbo06o6ej
+[2026-05-03 16:12:03,688] - INFO - prepview_engine_logger -  Starting PrepView AI Engine...
+[2026-05-03 16:12:03,690] - INFO - prepview_engine_logger - YAML file 'config\config.yaml' loaded successfully.
+[2026-05-03 16:12:03,694] - INFO - prepview_engine_logger - YAML file 'config\params.yaml' loaded successfully.
+[2026-05-03 16:12:03,694] - INFO - prepview_engine_logger - Configuration files loaded and artifacts root directory ensured.
+[2026-05-03 16:12:03,709] - INFO - prepview_engine_logger -  [DB] Connected to PostgreSQL via Config Manager
+[2026-05-03 16:12:03,742] - INFO - prepview_engine_logger - Initializing Analysis Pipeline Components...
+[2026-05-03 16:12:03,744] - INFO - prepview_engine_logger - YAML file 'config\config.yaml' loaded successfully.
+[2026-05-03 16:12:03,744] - INFO - prepview_engine_logger - YAML file 'config\params.yaml' loaded successfully.
+[2026-05-03 16:12:03,760] - INFO - prepview_engine_logger - Configuration files loaded and artifacts root directory ensured.
+[2026-05-03 16:12:03,762] - INFO - prepview_engine_logger -  [DB] Connected to PostgreSQL via Config Manager
+[2026-05-03 16:12:03,763] - INFO - prepview_engine_logger - PreprocessingComponent Initialized.
+[2026-05-03 16:12:03,764] - INFO - prepview_engine_logger - Loading CV Model Configuration...
+[2026-05-03 16:12:03,765] - INFO - prepview_engine_logger - CVAnalyzerComponent Initialized.
+[2026-05-03 16:12:03,765] - INFO - prepview_engine_logger - Loading NLP Model Configuration...
+[2026-05-03 16:12:05,507] - INFO - sentence_transformers.SentenceTransformer - Use pytorch device_name: cpu
+[2026-05-03 16:12:05,507] - INFO - sentence_transformers.SentenceTransformer - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+[2026-05-03 16:12:09,960] - INFO - prepview_engine_logger - NLPAnalyzerComponent Initialized.
+[2026-05-03 16:12:09,960] - INFO - prepview_engine_logger - Loading Code Configuration...
+[2026-05-03 16:12:09,976] - INFO - prepview_engine_logger - Pipeline Components Ready.
+[2026-05-03 16:12:09,976] - INFO - prepview_engine_logger - Result Aggregator Initialized (with DB connection).
+[2026-05-03 16:12:09,976] - INFO - prepview_engine_logger -  Report Generator Initialized (Provider: groq, Model: llama-3.3-70b-versatile)
+[2026-05-03 16:12:09,976] - INFO - prepview_engine_logger -  All Systems Ready!
+[2026-05-03 16:12:18,960] - INFO - prepview_engine_logger - Fetching chunks internally for Session: session-1777801735904-xbo06o6ej
+[2026-05-03 16:12:28,318] - INFO - prepview_engine_logger -  Final Report created for Session: session-1777801735904-xbo06o6ej
+[2026-05-03 16:16:37,503] - INFO - prepview_engine_logger -  Starting PrepView AI Engine...
+[2026-05-03 16:16:37,503] - INFO - prepview_engine_logger - YAML file 'config\config.yaml' loaded successfully.
+[2026-05-03 16:16:37,523] - INFO - prepview_engine_logger - YAML file 'config\params.yaml' loaded successfully.
+[2026-05-03 16:16:37,524] - INFO - prepview_engine_logger - Configuration files loaded and artifacts root directory ensured.
+[2026-05-03 16:16:37,547] - INFO - prepview_engine_logger -  [DB] Connected to PostgreSQL via Config Manager
+[2026-05-03 16:16:37,566] - INFO - prepview_engine_logger - Initializing Analysis Pipeline Components...
+[2026-05-03 16:16:37,570] - INFO - prepview_engine_logger - YAML file 'config\config.yaml' loaded successfully.
+[2026-05-03 16:16:37,577] - INFO - prepview_engine_logger - YAML file 'config\params.yaml' loaded successfully.
+[2026-05-03 16:16:37,577] - INFO - prepview_engine_logger - Configuration files loaded and artifacts root directory ensured.
+[2026-05-03 16:16:37,585] - INFO - prepview_engine_logger -  [DB] Connected to PostgreSQL via Config Manager
+[2026-05-03 16:16:37,587] - INFO - prepview_engine_logger - PreprocessingComponent Initialized.
+[2026-05-03 16:16:37,588] - INFO - prepview_engine_logger - Loading CV Model Configuration...
+[2026-05-03 16:16:37,589] - INFO - prepview_engine_logger - CVAnalyzerComponent Initialized.
+[2026-05-03 16:16:37,589] - INFO - prepview_engine_logger - Loading NLP Model Configuration...
+[2026-05-03 16:16:39,447] - INFO - sentence_transformers.SentenceTransformer - Use pytorch device_name: cpu
+[2026-05-03 16:16:39,447] - INFO - sentence_transformers.SentenceTransformer - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+[2026-05-03 16:16:43,831] - INFO - prepview_engine_logger - NLPAnalyzerComponent Initialized.
+[2026-05-03 16:16:43,831] - INFO - prepview_engine_logger - Loading Code Configuration...
+[2026-05-03 16:16:43,839] - INFO - prepview_engine_logger - Pipeline Components Ready.
+[2026-05-03 16:16:43,857] - INFO - prepview_engine_logger - Result Aggregator Initialized (with DB connection).
+[2026-05-03 16:16:43,857] - INFO - prepview_engine_logger -  Report Generator Initialized (Provider: groq, Model: llama-3.3-70b-versatile)
+[2026-05-03 16:16:43,857] - INFO - prepview_engine_logger -  All Systems Ready!
+[2026-05-03 16:16:51,098] - INFO - prepview_engine_logger - Fetching chunks internally for Session: session-1777801735904-xbo06o6ej
+[2026-05-03 16:16:55,221] - ERROR - prepview_engine_logger -  Failed to generate final report summary: 'int' object has no attribute 'get'
+Traceback (most recent call last):
+  File "C:\Users\Inshal Munaf\Desktop\prepview_app\server\src\prepview_engine\components\result_aggregator.py", line 92, in aggregate_session
+    nervousness_scores.append(breakdown.get("total_concerned_percentage", 0))
+                              ^^^^^^^^^^^^^
+AttributeError: 'int' object has no attribute 'get'
+[2026-05-03 16:16:55,221] - ERROR - prepview_engine_logger -  No data found for session session-1777801735904-xbo06o6ej. Cannot generate report.
+[2026-05-03 16:21:02,702] - INFO - prepview_engine_logger -  Starting PrepView AI Engine...
+[2026-05-03 16:21:02,702] - INFO - prepview_engine_logger - YAML file 'config\config.yaml' loaded successfully.
+[2026-05-03 16:21:02,702] - INFO - prepview_engine_logger - YAML file 'config\params.yaml' loaded successfully.
+[2026-05-03 16:21:02,718] - INFO - prepview_engine_logger - Configuration files loaded and artifacts root directory ensured.
+[2026-05-03 16:21:02,739] - INFO - prepview_engine_logger -  [DB] Connected to PostgreSQL via Config Manager
+[2026-05-03 16:21:02,757] - INFO - prepview_engine_logger - Initializing Analysis Pipeline Components...
+[2026-05-03 16:21:02,760] - INFO - prepview_engine_logger - YAML file 'config\config.yaml' loaded successfully.
+[2026-05-03 16:21:02,770] - INFO - prepview_engine_logger - YAML file 'config\params.yaml' loaded successfully.
+[2026-05-03 16:21:02,770] - INFO - prepview_engine_logger - Configuration files loaded and artifacts root directory ensured.
+[2026-05-03 16:21:02,770] - INFO - prepview_engine_logger -  [DB] Connected to PostgreSQL via Config Manager
+[2026-05-03 16:21:02,770] - INFO - prepview_engine_logger - PreprocessingComponent Initialized.
+[2026-05-03 16:21:02,770] - INFO - prepview_engine_logger - Loading CV Model Configuration...
+[2026-05-03 16:21:02,776] - INFO - prepview_engine_logger - CVAnalyzerComponent Initialized.
+[2026-05-03 16:21:02,777] - INFO - prepview_engine_logger - Loading NLP Model Configuration...
+[2026-05-03 16:21:04,577] - INFO - sentence_transformers.SentenceTransformer - Use pytorch device_name: cpu
+[2026-05-03 16:21:04,577] - INFO - sentence_transformers.SentenceTransformer - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+[2026-05-03 16:21:09,173] - INFO - prepview_engine_logger - NLPAnalyzerComponent Initialized.
+[2026-05-03 16:21:09,174] - INFO - prepview_engine_logger - Loading Code Configuration...
+[2026-05-03 16:21:09,185] - INFO - prepview_engine_logger - Pipeline Components Ready.
+[2026-05-03 16:21:09,193] - INFO - prepview_engine_logger - Result Aggregator Initialized (with DB connection).
+[2026-05-03 16:21:09,193] - INFO - prepview_engine_logger -  Report Generator Initialized (Provider: groq, Model: llama-3.3-70b-versatile)
+[2026-05-03 16:21:09,193] - INFO - prepview_engine_logger -  All Systems Ready!
+[2026-05-03 16:21:27,623] - INFO - prepview_engine_logger - Fetching chunks internally for Session: session-1777801735904-xbo06o6ej
+[2026-05-03 16:21:34,661] - INFO - prepview_engine_logger -  Final Report created for Session: session-1777801735904-xbo06o6ej
+[2026-05-03 16:26:38,636] - INFO - prepview_engine_logger -  Starting PrepView AI Engine...
+[2026-05-03 16:26:38,636] - INFO - prepview_engine_logger - YAML file 'config\config.yaml' loaded successfully.
+[2026-05-03 16:26:38,657] - INFO - prepview_engine_logger - YAML file 'config\params.yaml' loaded successfully.
+[2026-05-03 16:26:38,659] - INFO - prepview_engine_logger - Configuration files loaded and artifacts root directory ensured.
+[2026-05-03 16:26:38,678] - INFO - prepview_engine_logger -  [DB] Connected to PostgreSQL via Config Manager
+[2026-05-03 16:26:38,694] - INFO - prepview_engine_logger - Initializing Analysis Pipeline Components...
+[2026-05-03 16:26:38,699] - INFO - prepview_engine_logger - YAML file 'config\config.yaml' loaded successfully.
+[2026-05-03 16:26:38,710] - INFO - prepview_engine_logger - YAML file 'config\params.yaml' loaded successfully.
+[2026-05-03 16:26:38,710] - INFO - prepview_engine_logger - Configuration files loaded and artifacts root directory ensured.
+[2026-05-03 16:26:38,710] - INFO - prepview_engine_logger -  [DB] Connected to PostgreSQL via Config Manager
+[2026-05-03 16:26:38,710] - INFO - prepview_engine_logger - PreprocessingComponent Initialized.
+[2026-05-03 16:26:38,710] - INFO - prepview_engine_logger - Loading CV Model Configuration...
+[2026-05-03 16:26:38,721] - INFO - prepview_engine_logger - CVAnalyzerComponent Initialized.
+[2026-05-03 16:26:38,721] - INFO - prepview_engine_logger - Loading NLP Model Configuration...
+[2026-05-03 16:26:40,575] - INFO - sentence_transformers.SentenceTransformer - Use pytorch device_name: cpu
+[2026-05-03 16:26:40,575] - INFO - sentence_transformers.SentenceTransformer - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+[2026-05-03 16:26:48,288] - INFO - prepview_engine_logger - NLPAnalyzerComponent Initialized.
+[2026-05-03 16:26:48,288] - INFO - prepview_engine_logger - Loading Code Configuration...
+[2026-05-03 16:26:48,288] - INFO - prepview_engine_logger - Pipeline Components Ready.
+[2026-05-03 16:26:48,304] - INFO - prepview_engine_logger - Result Aggregator Initialized (with DB connection).
+[2026-05-03 16:26:48,304] - INFO - prepview_engine_logger -  Report Generator Initialized (Provider: groq, Model: llama-3.3-70b-versatile)
+[2026-05-03 16:26:48,304] - INFO - prepview_engine_logger -  All Systems Ready!
+[2026-05-03 16:26:53,192] - INFO - prepview_engine_logger - Fetching chunks internally for Session: session-1777801735904-xbo06o6ej
+[2026-05-03 16:27:03,689] - INFO - prepview_engine_logger -  Final Report created for Session: session-1777801735904-xbo06o6ej

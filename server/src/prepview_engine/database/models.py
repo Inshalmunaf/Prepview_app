@@ -69,7 +69,6 @@ class InterviewSession(Base):
     chunks = relationship("InterviewChunk", back_populates="session")
     report = relationship("FinalReport", back_populates="session")
 
-
 # ==========================================
 # 4. INTERVIEW CHUNKS (Analysis Data)
 # ==========================================
@@ -83,19 +82,24 @@ class InterviewChunk(Base):
     question_id = Column(String) # e.g. "Q1"
 
     # 🧠 NLP Data (Direct JSON storage)
-    nlp_full_json = Column(JSON)       
-    transcript = Column(Text)
-    speech_metrics = Column(JSON)      
-    linguistic_metrics = Column(JSON)  
-    phase1_score = Column(Float)
-    prosodic_confidence = Column(Float)
+    nlp_full_json = Column(JSON, nullable=True)       
+    transcript = Column(Text, nullable=True)
+    speech_metrics = Column(JSON, nullable=True)      
+    linguistic_metrics = Column(JSON, nullable=True)  
+    phase1_score = Column(Float, nullable=True)
+    prosodic_confidence = Column(Float, nullable=True)
 
     # 👁️ CV/Video Data
-    cv_full_json = Column(JSON)
-    head_movement = Column(JSON)
-    eye_gaze = Column(JSON)
-    facial_expression = Column(JSON)
-    cv_score = Column(Float)
+    cv_full_json = Column(JSON, nullable=True)
+    head_movement = Column(JSON, nullable=True)
+    eye_gaze = Column(JSON, nullable=True)
+    facial_expression = Column(JSON, nullable=True)
+    cv_score = Column(Float, nullable=True)
+
+    # 💻 CODE & PROCTORING DATA (NEW)
+    original_technical_score = Column(Float, nullable=True)
+    score_with_penalties = Column(Float, nullable=True)
+    proctoring_results = Column(JSON, nullable=True)
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
@@ -116,9 +120,13 @@ class FinalReport(Base):
     userId = Column(String, ForeignKey('users.id'))
 
     # AI Output
-    nlp_aggregate = Column(JSON)
-    cv_aggregate = Column(JSON)
-    ai_feedback = Column(Text)
+    nlp_aggregate = Column(JSON, nullable=True)
+    cv_aggregate = Column(JSON, nullable=True)
+    
+    # 💻 CODE & PROCTORING AGGREGATE (NEW)
+    code_aggregate = Column(JSON, nullable=True)
+    
+    ai_feedback = Column(Text, nullable=True)
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 

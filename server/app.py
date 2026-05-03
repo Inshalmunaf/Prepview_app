@@ -118,7 +118,7 @@ def generate_report_task(request: ReportRequest):
         aggregated_data = aggregator.aggregate_session(request.session_id)
         
         if not aggregated_data:
-            logger.error(f"❌ No data found for session {request.session_id}. Cannot generate report.")
+            logger.error(f" No data found for session {request.session_id}. Cannot generate report.")
             return
 
         # Step 2: Generate AI Feedback
@@ -134,12 +134,14 @@ def generate_report_task(request: ReportRequest):
         
         nlp_data = aggregated_data.get("nlp_aggregate", {})
         cv_data = aggregated_data.get("cv_aggregate", {})
+        code_data = aggregated_data.get("code_aggregate",{})
 
         success = db_connector.save_final_report(
             session_id=request.session_id,
             user_id=request.user_id,
             nlp_agg=nlp_data,
             cv_agg=cv_data,
+            code_agg=code_data,
             feedback_text=feedback_text
         )
 

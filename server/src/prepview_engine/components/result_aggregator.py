@@ -26,103 +26,154 @@ class ResultAggregator:
     # ==========================================
     #  MAIN FUNCTION
     # ==========================================
-    def aggregate_session(self, session_id: str) -> Dict[str, Any]:
+    def aggregate_session(self, session_id: str) -> dict:
         """
-        Fetches chunks internally using session_id and produces a summary.
-        Now compatible with SQLAlchemy Objects.
+        Aggregates NLP, CV, and Code chunks into a detailed summary.
+        Returns the dictionary so it can be saved by another function.
         """
-        
-        # 1. Fetch Data from DB internally
-        logger.info(f"Fetching chunks internally for Session: {session_id}")
-        
-        session_chunks = self.db.fetch_session_chunks(session_id)
-
-        if not session_chunks:
-            logger.warning(f"No chunks found for Session ID: {session_id}")
-            return {}
-
-        logger.info(f"Aggregating {len(session_chunks)} chunks...")
-
-        # 2. Storage Containers
-        # NLP
-        wpms, filler_rates, nlp_scores = [], [], []
-        # CV
-        cv_scores, eye_contacts, nervousness_scores, dominant_moods = [], [], [], []
-
-        # Weakest Link Logic
-        lowest_combined_score = 101.0
-        worst_transcript_snippet = "No transcript available."
-        worst_question_id = "N/A"
-
-        # 3. Iterate & Extract 
-        for chunk in session_chunks:
+        try:
+            # 1. Fetch Data from DB internally
+            logger.info(f"Fetching chunks internally for Session: {session_id}")
             
-            # --- Scores (Handling Attributes) ---
-            n_score = getattr(chunk, "phase1_score", 0) or 0
-            nlp_scores.append(n_score)
+            session_chunks = self.db.fetch_session_chunks(session_id)
 
-            c_score = getattr(chunk, "cv_score", 0) or 0 
-            cv_scores.append(c_score)
+            if not session_chunks:
+                logger.warning(f"No chunks found for Session ID: {session_id}")
+                return {}
 
-            # --- Detailed Metrics (Handling JSON Fields) ---
-            # DB se JSON field "None" aasakti hai, isliye "or {}" zaroori hai
-            
-            # 1. Speech
-            speech = getattr(chunk, "speech_metrics", {}) or {}
-            wpms.append(speech.get("speech_rate_wpm", 0))
-            filler_rates.append(speech.get("filler_rate", 0))
 
-            # 2. Eye Gaze
-            eye_data = getattr(chunk, "eye_gaze", {}) or {}
-            eye_contacts.append(eye_data.get("eye_contact_percentage", 0))
+            # --- NLP & CV Lists ---
+            nlp_scores, wpms, filler_rates = [], [], []
+            lexical_richnesses, repetition_ratios, semantic_instabilities, aux_verb_ratios = [], [], [], []
+            cv_scores, eye_contacts, nervousness_scores = [], [], []
+            total_emotions = {"happy": 0.0, "neutral": 0.0, "surprised": 0.0, "concerned": 0.0}
 
-            # 3. Facial Expressions
-            face_data = getattr(chunk, "facial_expression", {}) or {}
-            dominant_moods.append(face_data.get("dominant_mood", "neutral"))
-            
-            nerv_data = face_data.get("nervousness_analysis") or {}
-            nervousness_scores.append(nerv_data.get("total_concerned_percentage", 0))
+            # --- Weakest Answer Trackers ---
+            lowest_combined_score = float('inf')
+            worst_question_id = None
+            worst_transcript_snippet = ""
 
-            # --- 4. Weakest Answer Logic (Combined Score) ---
-            if n_score > 0 and c_score > 0:
-                current_combined = (n_score + c_score) / 2
-            else:
-                current_combined = n_score if n_score > 0 else c_score
+            # --- Code & Proctoring Trackers ---
+            total_penalty_score = 0
+            coding_question_count = 0
+            cheating_incidents = []
 
-            # Logic to find the worst answer
-            if current_combined > 0 and current_combined < lowest_combined_score:
-                lowest_combined_score = current_combined
+            # Loop through all chunks once
+            for chunk in session_chunks:
                 
-                # Attribute Access
-                worst_question_id = getattr(chunk, "question_id", "Unknown")
-                raw_text = getattr(chunk, "transcript", "") or ""
-                
-                worst_transcript_snippet = raw_text[:800] if raw_text else "Audio unclear."
+                # ==========================================
+                # 1. VERBAL EXTRACTION (NLP & CV)
+                # ==========================================
+                if chunk.phase1_score is not None and chunk.phase1_score > 0:
+                    
+                    nlp_val = chunk.phase1_score
+                    cv_val = chunk.cv_score or 0.0
+                    
+                    nlp_scores.append(nlp_val)
+                    cv_scores.append(cv_val)
 
-        # 5. Final Calculations
-        final_mood = "neutral"
-        if dominant_moods:
-            # Most common mood nikalna
-            final_mood = Counter(dominant_moods).most_common(1)[0][0]
+                    # Metrics Extract (Assuming DB fields match these exact keys)
+                    if chunk.speech_metrics:
+                        wpms.append(chunk.speech_metrics.get("speech_rate_wpm", 0))
+                        filler_rates.append(chunk.speech_metrics.get("filler_rate", 0))
+                    if chunk.linguistic_metrics:
+                        # Direct values extract karein
+                        lexical_richnesses.append(chunk.linguistic_metrics.get("lexical_richness", 0.0))
+                        repetition_ratios.append(chunk.linguistic_metrics.get("repetition_ratio", 0.0))
+                        semantic_instabilities.append(chunk.linguistic_metrics.get("semantic_instability", 0.0))
+                        
+                        # Nested value (aux_verb_ratio) extract karne ke liye safe approach
+                        synth_uncertainty = chunk.linguistic_metrics.get("syntactic_uncertainty", {})
+                        aux_verb_ratios.append(synth_uncertainty.get("aux_verb_ratio", 0.0))
+                    if chunk.eye_gaze:
+                        eye_contacts.append(chunk.eye_gaze.get("eye_contact_percentage", 0))
+                    if chunk.facial_expression:
+                    # DB se emotion_distribution wali dictionary nikalen
+                        nervousness_analysis = chunk.facial_expression.get("nervousness_analysis", {})
+                        nervousness_scores.append(nervousness_analysis.get("total_concerned_percentage", 0.0))
+                        emotion_dist = chunk.facial_expression.get("emotion_distribution", {})
+                        
+                        # Har mood ki value ko jama karein (safe float casting ke sath)
+                        total_emotions["happy"] += float(emotion_dist.get("happy", 0.0))
+                        total_emotions["neutral"] += float(emotion_dist.get("neutral", 0.0))
+                        total_emotions["surprised"] += float(emotion_dist.get("surprised", 0.0))
+                        total_emotions["concerned"] += float(emotion_dist.get("concerned", 0.0))
 
-        summary = {
-            "nlp_aggregate": {
-                "avg_nlp_score": self._safe_mean(nlp_scores),
-                "avg_wpm": self._safe_mean(wpms),
-                "avg_filler_rate": self._safe_mean(filler_rates),
+                    # Find Weakest Answer
+                    combined_score = (nlp_val + cv_val) / 2
+                    if combined_score < lowest_combined_score:
+                        lowest_combined_score = combined_score
+                        worst_question_id = chunk.question_id
+                        worst_transcript_snippet = (chunk.transcript or "")[:150] + "..."
+
+                # ==========================================
+                # 2. CODE & PROCTORING EXTRACTION
+                # ==========================================
+                proc_results = chunk.proctoring_results or {}
+                if "is_cheating_suspected" in proc_results:
+                    coding_question_count += 1
+                    total_penalty_score += (chunk.score_with_penalties or 0)
+
+                    if proc_results.get("is_cheating_suspected") == True:
+                        cheating_incidents.append({
+                            "question_id": chunk.question_id,
+                            "reasons": proc_results.get("reasons", [])
+                        })
+
+            # ==========================================
+            # 3. FINAL CALCULATIONS
+            # ==========================================
+            if lowest_combined_score == float('inf'):
+                lowest_combined_score = 0.0
+
+            # Default mood
+            dominant_mood = "Neutral"
+
+            # Agar saari values 0 nahi hain (Yani verbal chunks thay)
+            if sum(total_emotions.values()) > 0:
+                # max() function dictionary mein se sab se bari value wali key nikal layega
+                max_emotion = max(total_emotions, key=total_emotions.get) 
                 
-                # Context info for LLM
-                "weakest_answer_id": worst_question_id,
-                "lowest_combined_score": round(lowest_combined_score, 2),
-                "transcript_sample": worst_transcript_snippet
-            },
-            
-            "cv_aggregate": {
-                "avg_cv_score": self._safe_mean(cv_scores),
-                "avg_eye_contact": self._safe_mean(eye_contacts),
-                "avg_nervousness": self._safe_mean(nervousness_scores),
-                "dominant_mood": final_mood
+                # Capitalize the first letter (e.g., "happy" -> "Happy")
+                dominant_mood = max_emotion.capitalize()
+
+            avg_code = total_penalty_score / coding_question_count if coding_question_count > 0 else 0.0
+
+            # ==========================================
+            # 4. BUILD REQUESTED DICTIONARIES
+            # ==========================================
+            summary = {
+                "nlp_aggregate": {
+                    "avg_nlp_score": self._safe_mean(nlp_scores),
+                    "avg_wpm": self._safe_mean(wpms),
+                    "avg_filler_rate": self._safe_mean(filler_rates),
+                    "avg_lexical_richness": self._safe_mean(lexical_richnesses),
+                    "avg_repetition_ratio": self._safe_mean(repetition_ratios),
+                    "avg_uncertainty": self._safe_mean(aux_verb_ratios),
+                    "avg_semantic_instability": self._safe_mean(semantic_instabilities),
+                    # Context info for LLM
+                    "weakest_answer_id": worst_question_id,
+                    "lowest_combined_score": round(lowest_combined_score, 2),
+                    "transcript_sample": worst_transcript_snippet
+                },
+                
+                "cv_aggregate": {
+                    "avg_cv_score": self._safe_mean(cv_scores),
+                    "avg_eye_contact": self._safe_mean(eye_contacts),
+                    "avg_nervousness": self._safe_mean(nervousness_scores),
+                    "dominant_mood": dominant_mood
+                },
+
+                "code_aggregate": {
+                    "avg_score_with_penalties": round(avg_code, 2),
+                    "total_coding_questions_attempted": coding_question_count,
+                    "cheating_incidents": cheating_incidents
+                }
             }
-        }
 
-        return self._sanitize(summary)
+            return self._sanitize(summary)
+
+        except Exception as e:
+            logger.error(f" Failed to generate final report summary: {e}", exc_info=True)
+            return {}
+ 

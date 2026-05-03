@@ -54,7 +54,6 @@ model CV {
 // 3. INTERVIEW SESSION TABLE (The "Folder")
 // ==========================================
 model InterviewSession {
-  // Aapki requirement ke mutabiq session_id hi Primary Key hai
   session_id    String   @id @unique
   
   // Link to User
@@ -100,6 +99,11 @@ model InterviewChunk {
   facial_expression   Json?
   cv_score            Float?
 
+  // 💻 Code Evaluation & Proctoring Data (NEW)
+  original_technical_score Float?    
+  score_with_penalties     Float?    
+  proctoring_results       Json?   
+
   created_at          DateTime @default(now())
 
   @@map("interview_chunks")
@@ -109,22 +113,26 @@ model InterviewChunk {
 // 5. FINAL REPORT TABLE (Summary)
 // ==========================================
 model FinalReport {
-  id            Int      @id @default(autoincrement())
+  id             Int      @id @default(autoincrement())
   
   // Link to Session (One-to-One)
-  session_id    String   @unique
-  session       InterviewSession @relation(fields: [session_id], references: [session_id], onDelete: Cascade)
+  session_id     String   @unique
+  session        InterviewSession @relation(fields: [session_id], references: [session_id], onDelete: Cascade)
   
   // Link to User
-  userId        String
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
   // AI Output
-  nlp_aggregate Json     // Stores WPM, Fillers, etc.
-  cv_aggregate  Json     // Stores Eye Contact, etc.
-  ai_feedback   String   @db.Text
+  nlp_aggregate  Json     // Stores WPM, Fillers, etc.
+  cv_aggregate   Json     // Stores Eye Contact, etc.
   
-  created_at    DateTime @default(now())
+  // 💻 Code & Integrity Output (NEW)
+  code_aggregate Json?    // Will store { "avg_original_technical_score": 85, "score_with_penalties": 0, "is_cheating_suspected": true, "reasons": [...] }
+  
+  ai_feedback    String   @db.Text
+  
+  created_at     DateTime @default(now())
 
   @@map("final_reports")
 }
