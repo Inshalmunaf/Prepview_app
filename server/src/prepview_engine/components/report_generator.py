@@ -27,20 +27,36 @@ class ReportGenerator:
 
         try:
             # 1. Extract Data
+            # 1. Extract Aggregates Safely
             nlp = aggregated_data.get("nlp_aggregate", {})
             cv = aggregated_data.get("cv_aggregate", {})
+            code = aggregated_data.get("code_aggregate", {}) # 🌟 Nayi Line
 
             # 2. Fill User Prompt
             user_prompt = self.config.user_prompt_template.format(
+                # --- CV Metrics ---
                 avg_cv_score=cv.get("avg_cv_score", 0),
                 avg_eye_contact=cv.get("avg_eye_contact", 0),
                 avg_nervousness=cv.get("avg_nervousness", 0),
                 dominant_mood=cv.get("dominant_mood", "Neutral"),
                 
+                # --- NLP & Verbal Metrics ---
                 avg_nlp_score=nlp.get("avg_nlp_score", 0),
                 avg_wpm=nlp.get("avg_wpm", 0),
                 avg_filler_rate=nlp.get("avg_filler_rate", 0),
                 
+                # 🌟 Nayi Linguistic Metrics 🌟
+                avg_lexical_richness=nlp.get("avg_lexical_richness", 0),
+                avg_repetition_ratio=nlp.get("avg_repetition_ratio", 0),
+                avg_uncertainty=nlp.get("avg_uncertainty", 0),
+                avg_semantic_instability=nlp.get("avg_semantic_instability", 0),
+                
+                # 🌟 Nayi Coding & Proctoring Metrics 🌟
+                total_coding_questions_attempted=code.get("total_coding_questions_attempted", 0),
+                avg_score_with_penalties=code.get("avg_score_with_penalties", 0),
+                cheating_incidents=code.get("cheating_incidents", []),
+                
+                # --- Weakest Link Info ---
                 weakest_answer_id=nlp.get("weakest_answer_id", "Unknown"),
                 lowest_combined_score=nlp.get("lowest_combined_score", 0),
                 transcript_sample=nlp.get("transcript_sample", "No text available.")

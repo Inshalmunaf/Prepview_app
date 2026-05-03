@@ -1769,3 +1769,53 @@ AttributeError: 'int' object has no attribute 'get'
 [2026-05-03 16:26:48,304] - INFO - prepview_engine_logger -  All Systems Ready!
 [2026-05-03 16:26:53,192] - INFO - prepview_engine_logger - Fetching chunks internally for Session: session-1777801735904-xbo06o6ej
 [2026-05-03 16:27:03,689] - INFO - prepview_engine_logger -  Final Report created for Session: session-1777801735904-xbo06o6ej
+[2026-05-03 16:33:01,670] - INFO - prepview_engine_logger -  Starting PrepView AI Engine...
+[2026-05-03 16:33:01,673] - INFO - prepview_engine_logger - YAML file 'config\config.yaml' loaded successfully.
+[2026-05-03 16:33:01,680] - INFO - prepview_engine_logger - YAML file 'config\params.yaml' loaded successfully.
+[2026-05-03 16:33:01,680] - INFO - prepview_engine_logger - Configuration files loaded and artifacts root directory ensured.
+[2026-05-03 16:33:01,695] - INFO - prepview_engine_logger -  [DB] Connected to PostgreSQL via Config Manager
+[2026-05-03 16:33:01,711] - INFO - prepview_engine_logger - Initializing Analysis Pipeline Components...
+[2026-05-03 16:33:01,711] - INFO - prepview_engine_logger - YAML file 'config\config.yaml' loaded successfully.
+[2026-05-03 16:33:01,731] - INFO - prepview_engine_logger - YAML file 'config\params.yaml' loaded successfully.
+[2026-05-03 16:33:01,731] - INFO - prepview_engine_logger - Configuration files loaded and artifacts root directory ensured.
+[2026-05-03 16:33:01,731] - INFO - prepview_engine_logger -  [DB] Connected to PostgreSQL via Config Manager
+[2026-05-03 16:33:01,731] - INFO - prepview_engine_logger - PreprocessingComponent Initialized.
+[2026-05-03 16:33:01,731] - INFO - prepview_engine_logger - Loading CV Model Configuration...
+[2026-05-03 16:33:01,731] - INFO - prepview_engine_logger - CVAnalyzerComponent Initialized.
+[2026-05-03 16:33:01,743] - INFO - prepview_engine_logger - Loading NLP Model Configuration...
+[2026-05-03 16:33:03,488] - INFO - sentence_transformers.SentenceTransformer - Use pytorch device_name: cpu
+[2026-05-03 16:33:03,488] - INFO - sentence_transformers.SentenceTransformer - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+[2026-05-03 16:33:07,407] - INFO - prepview_engine_logger - NLPAnalyzerComponent Initialized.
+[2026-05-03 16:33:07,407] - INFO - prepview_engine_logger - Loading Code Configuration...
+[2026-05-03 16:33:07,417] - INFO - prepview_engine_logger - Pipeline Components Ready.
+[2026-05-03 16:33:07,426] - INFO - prepview_engine_logger - Result Aggregator Initialized (with DB connection).
+[2026-05-03 16:33:07,426] - INFO - prepview_engine_logger -  Report Generator Initialized (Provider: groq, Model: llama-3.3-70b-versatile)
+[2026-05-03 16:33:07,426] - INFO - prepview_engine_logger -  All Systems Ready!
+[2026-05-03 16:33:40,296] - INFO - prepview_engine_logger - Fetching chunks internally for Session: session-1777801735904-xbo06o6ej
+[2026-05-03 16:33:49,640] - INFO - prepview_engine_logger -  Final Report updated for Session: session-1777801735904-xbo06o6ej
+[2026-05-03 16:48:13,096] - INFO - prepview_engine_logger -  Starting PrepView AI Engine...
+[2026-05-03 16:48:13,096] - INFO - prepview_engine_logger - YAML file 'config\config.yaml' loaded successfully.
+[2026-05-03 16:48:13,118] - ERROR - prepview_engine_logger - Error reading YAML file 'config\params.yaml': 'charmap' codec can't decode byte 0x81 in position 5653: character maps to <undefined>
+[2026-05-03 16:48:13,119] - ERROR - prepview_engine_logger - Error loading configuration files: 'charmap' codec can't decode byte 0x81 in position 5653: character maps to <undefined>
+[2026-05-03 16:48:13,119] - CRITICAL - prepview_engine_logger -  Initialization Failed: 'charmap' codec can't decode byte 0x81 in position 5653: character maps to <undefined>
+[2026-05-03 16:50:17,460] - INFO - prepview_engine_logger -  Starting PrepView AI Engine...
+[2026-05-03 16:50:17,463] - INFO - prepview_engine_logger - YAML file 'config\config.yaml' loaded successfully.
+[2026-05-03 16:50:17,485] - INFO - prepview_engine_logger - YAML file 'config\params.yaml' loaded successfully.
+[2026-05-03 16:50:17,495] - INFO - prepview_engine_logger - Configuration files loaded and artifacts root directory ensured.
+[2026-05-03 16:50:17,520] - INFO - prepview_engine_logger -  [DB] Connected to PostgreSQL via Config Manager
+[2026-05-03 16:50:17,536] - INFO - prepview_engine_logger - Initializing Analysis Pipeline Components...
+[2026-05-03 16:50:17,537] - INFO - prepview_engine_logger - YAML file 'config\config.yaml' loaded successfully.
+[2026-05-03 16:50:17,551] - INFO - prepview_engine_logger - YAML file 'config\params.yaml' loaded successfully.
+[2026-05-03 16:50:17,552] - INFO - prepview_engine_logger - Configuration files loaded and artifacts root directory ensured.
+[2026-05-03 16:50:17,553] - INFO - prepview_engine_logger -  [DB] Connected to PostgreSQL via Config Manager
+[2026-05-03 16:50:17,554] - INFO - prepview_engine_logger - PreprocessingComponent Initialized.
+[2026-05-03 16:50:17,554] - INFO - prepview_engine_logger - Loading CV Model Configuration...
+[2026-05-03 16:50:17,555] - INFO - prepview_engine_logger - CVAnalyzerComponent Initialized.
+[2026-05-03 16:50:17,555] - INFO - prepview_engine_logger - Loading NLP Model Configuration...
+[2026-05-03 16:50:19,280] - INFO - sentence_transformers.SentenceTransformer - Use pytorch device_name: cpu
+[2026-05-03 16:50:19,280] - INFO - sentence_transformers.SentenceTransformer - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+[2026-05-03 16:50:23,314] - INFO - prepview_engine_logger - NLPAnalyzerComponent Initialized.
+[2026-05-03 16:50:23,315] - INFO - prepview_engine_logger - Loading Code Configuration...
+[2026-05-03 16:50:23,324] - INFO - prepview_engine_logger - Pipeline Components Ready.
+[2026-05-03 16:50:23,332] - INFO - prepview_engine_logger - Result Aggregator Initialized (with DB connection).
+[2026-05-03 16:50:23,332] - CRITICAL - prepview_engine_logger -  Initialization Failed: 'NoneType' object has no attribute 'system_role'
